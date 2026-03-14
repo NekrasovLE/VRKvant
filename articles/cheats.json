@@ -7,6 +7,10 @@
     {
       "title": "Горячие клавиши Blender",
       "file": "blender_keys.md"
+    },
+    {
+      "title": "Как писать статьи/уроки",
+      "file": "writing_articles.md"
     }
   ]
 }
