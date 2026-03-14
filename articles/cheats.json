@@ -11,6 +11,10 @@
     {
       "title": "Как писать статьи/уроки",
       "file": "writing_articles.md"
+    },
+    {
+      "title": "Правила работы в команде",
+      "file": "teamwork.md"
     }
   ]
 }
