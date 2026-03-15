@@ -86,7 +86,7 @@ Markdown — это текстовый стандарт, который прев
 ```
 
 **Как это выглядит:**
-[gallery: img/unreal/interface_1.png | img/unreal/interface_2.png | img/unreal/interface_3.png]
+[gallery: img/unreal/unreal_logo.png | img/blender/blender_logo.png | img/unity/unity_logo.png]
 
 ### Слайдер «До и После»
 Отлично подходит для сравнения графики, рендеров или применения эффектов (ДО и ПОСЛЕ).
