@@ -102,6 +102,9 @@ public class PlayerController : MonoBehaviour {
 }
 ```
 
+Так же можно вставлять блюпринты с помощью [сайта]([url](https://blueprintue.com))
+<iframe src="https://blueprintue.com/render/yroj2grr/" scrolling="no" allowfullscreen></iframe>
+
 ### Видео (YouTube)
 Наш сайт поддерживает вставку через `iframe`. На YouTube нажмите «Поделиться» -> «Встроить» и скопируйте HTML-код. Вставьте его прямо в файл статьи.
 
