@@ -117,8 +117,16 @@
         .prose p code, .prose li code { background: #f1f5f9; color: #8b5cf6; padding: 0.2rem 0.4rem; border-radius: 0.4rem; font-family: monospace; font-size: 0.9em; font-weight: 600; }
         .dark .prose p code, .dark .prose li code { background: #1e293b; color: #a78bfa; }
         
-        .prose pre { position: relative; background: #1e293b; padding: 1.5rem; padding-top: 3.5rem; border-radius: 1rem; overflow-x: auto; margin-bottom: 1.5rem; color: #e2e8f0; }
+        .prose pre { position: relative; background: #1e293b; padding: 1.5rem; padding-top: 3.5rem; border-radius: 1rem; overflow-x: auto; margin-bottom: 1.5rem; color: #e2e8f0; scrollbar-width: thin; scrollbar-color: #475569 transparent; }
+        .dark .prose pre { background: #0f172a; border: 1px solid #1e293b; }
         .prose pre code { background: transparent !important; padding: 0; font-size: 0.9em; font-family: 'Courier New', Courier, monospace; line-height: 1.6; }
+
+        /* Красивый скроллбар для блоков кода (Chrome, Safari, Edge) */
+        .prose pre::-webkit-scrollbar { height: 8px; }
+        .prose pre::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; margin-bottom: 0.5rem; }
+        .prose pre::-webkit-scrollbar-thumb { background: #475569; border-radius: 0.5rem; border: 2px solid #1e293b; }
+        .dark .prose pre::-webkit-scrollbar-thumb { border-color: #0f172a; }
+        .prose pre::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
 
         .copy-code-btn { position: absolute; top: 0.75rem; right: 0.75rem; background: rgba(255, 255, 255, 0.1); color: #cbd5e1; border: none; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.7rem; font-weight: bold; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
         .copy-code-btn:hover { background: rgba(255, 255, 255, 0.2); color: white; }
