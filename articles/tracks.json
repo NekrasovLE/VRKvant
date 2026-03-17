@@ -3,13 +3,10 @@
     {
       "id": "blender",
       "name": "Blender Track",
-      "icon": "fas fa-shapes",
+      "icon": "https://cdn.simpleicons.org/blender/ffffff",
       "colorClass": "bg-orange-500",
       "lessons": [
-        {
-          "title": "Вступление",
-          "file": "intro.md"
-        }
+        { "title": "Вступление", "file": "intro.md" }
       ]
     },
     {
@@ -18,22 +15,16 @@
       "icon": "fab fa-unity",
       "colorClass": "bg-indigo-600",
       "lessons": [
-        {
-          "title": "Вступление",
-          "file": "intro.md"
-        }
+        { "title": "Вступление", "file": "intro.md" }
       ]
     },
     {
       "id": "unreal",
       "name": "Unreal Engine",
-      "icon": "fas fa-bolt",
+      "icon": "https://cdn.simpleicons.org/unrealengine/ffffff",
       "colorClass": "bg-slate-700",
       "lessons": [
-        {
-          "title": "Вступление",
-          "file": "intro.md"
-        }
+        { "title": "Вступление", "file": "intro.md" }
       ]
     }
   ]
