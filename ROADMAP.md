@@ -12,4 +12,4 @@
     - `name: github`
     - `repo: NekrasovLE/VRKvant`
     - `branch: main`
-    - `base_url: https://netlify-cms-github-oauth-provider-2kmx73z8y-nekrasov-le.vercel.app/callback`
+    - `base_url: https://netlify-cms-github-oauth-provider-2kmx73z8y-nekrasov-le.vercel.app`
