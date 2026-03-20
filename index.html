@@ -215,32 +215,34 @@
                         <h3 class="font-bold text-sm uppercase tracking-widest text-slate-700 dark:text-slate-200">Публикация</h3>
                         <button onclick="togglePublishPanel()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times"></i></button>
                     </div>
-                    <div class="p-5 flex-1 overflow-y-auto space-y-4 text-sm">
+                    <div class="p-5 flex-1 overflow-y-auto space-y-4 text-sm sidebar-scroll">
                         
                         <div>
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Токен GitHub (PAT)</label>
                             <input type="password" id="gh-token" placeholder="ghp_..." class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none focus:ring-2 ring-kvant/50">
-                            <div class="text-[9px] text-slate-400 mt-1 leading-tight">Сохраняется локально. Нужен токен с правами 'repo'.</div>
+                            <div class="text-[9px] text-slate-400 mt-1 leading-tight">Нужен токен с правами 'repo'. Сохраняется локально.</div>
                         </div>
 
                         <div class="w-full h-px bg-slate-100 dark:bg-slate-800 my-2"></div>
 
                         <div>
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Тип контента</label>
-                            <select id="meta-type" onchange="updateMetaFields()" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
-                                <option value="lesson">Урок (Треки)</option>
-                                <option value="cheat">Шпаргалка</option>
-                                <option value="project">Проект (Портфолио)</option>
+                            <select id="meta-type" onchange="window.updateMetaFields()" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none font-bold text-kvant">
+                                <option value="lesson">📘 Урок (Треки)</option>
+                                <option value="cheat">⚡ Шпаргалка</option>
+                                <option value="project">🏆 Проект (Портфолио)</option>
+                                <option value="intro">🚀 Новый Трек (Intro)</option>
                             </select>
                         </div>
                         
                         <div>
-                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Название (Title)</label>
-                            <input type="text" id="meta-title" placeholder="Введите название..." class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1" id="label-title">Название</label>
+                            <input type="text" id="meta-title" placeholder="Введите название..." oninput="window.autoTransliterate()" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none font-bold">
                         </div>
 
-                        <div id="field-track">
-                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Трек</label>
+                        <!-- Поля для Урока -->
+                        <div id="field-track" class="meta-group">
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Выбрать Трек</label>
                             <select id="meta-track" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
                                 <option value="blender">Blender</option>
                                 <option value="unity">Unity</option>
@@ -248,47 +250,92 @@
                             </select>
                         </div>
 
-                        <div id="field-module">
+                        <div id="field-module" class="meta-group">
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Модуль (Раздел)</label>
-                            <input type="text" id="meta-module" placeholder="Например: Основы" list="module-list" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
-                            <datalist id="module-list"></datalist>
+                            <input type="text" id="meta-module" placeholder="Например: Основы" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
                         </div>
 
-                        <div id="field-order">
+                        <div id="field-order" class="meta-group">
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Порядковый номер</label>
                             <input type="number" id="meta-order" value="10" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
+                            <div class="text-[9px] text-slate-400 mt-1 leading-tight">Определяет положение в списке (1 - первый).</div>
                         </div>
 
+                        <!-- Поля для Проекта -->
+                        <div id="field-project-desc" class="meta-group hidden">
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Краткое описание</label>
+                            <textarea id="meta-desc" rows="2" placeholder="О чем проект..." class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none resize-none"></textarea>
+                        </div>
+                        <div id="field-project-authors" class="meta-group hidden">
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Авторы</label>
+                            <input type="text" id="meta-authors" placeholder="Иванов И., Петров П." class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
+                        </div>
+                        <div id="field-project-tags" class="meta-group hidden">
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Теги (через запятую)</label>
+                            <input type="text" id="meta-tags" placeholder="VR, Quest, Unity" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
+                        </div>
+
+                        <!-- Поля для Нового Трека -->
+                        <div id="field-track-id" class="meta-group hidden">
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">ID Трека (Папка)</label>
+                            <input type="text" id="meta-track-id" placeholder="my_new_track" class="w-full bg-slate-200 dark:bg-slate-700 border-none rounded-lg px-3 py-2 text-xs outline-none font-mono text-slate-500" readonly>
+                        </div>
+                        <div id="field-track-icon" class="meta-group hidden">
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Иконка (FontAwesome класс)</label>
+                            <input type="text" id="meta-icon" placeholder="fas fa-gamepad" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none">
+                        </div>
+                        <div id="field-track-color" class="meta-group hidden">
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Цвет (Tailwind класс)</label>
+                            <select id="meta-color" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-3 py-2 text-xs outline-none font-mono">
+                                <option value="bg-kvant" class="text-kvant">bg-kvant</option>
+                                <option value="bg-blue-600" class="text-blue-600">bg-blue-600</option>
+                                <option value="bg-green-600" class="text-green-600">bg-green-600</option>
+                                <option value="bg-red-600" class="text-red-600">bg-red-600</option>
+                                <option value="bg-orange-600" class="text-orange-600">bg-orange-600</option>
+                                <option value="bg-zinc-800" class="text-zinc-500">bg-zinc-800</option>
+                            </select>
+                        </div>
+
+                        <div class="w-full h-px bg-slate-100 dark:bg-slate-800 my-2"></div>
+
                         <div id="field-filename">
-                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Имя файла (a-z, 0-9, _)</label>
+                            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Имя файла (Авто)</label>
                             <div class="flex items-center">
-                                <input type="text" id="meta-filename" placeholder="my_article" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-l-lg px-3 py-2 text-xs outline-none text-right">
-                                <span class="bg-slate-200 dark:bg-slate-700 px-3 py-2 rounded-r-lg text-xs text-slate-500 font-mono">.md</span>
+                                <input type="text" id="meta-filename" placeholder="generiruetsya_zdes" class="w-full bg-slate-200 dark:bg-slate-700 border-none rounded-l-lg px-3 py-2 text-xs outline-none text-right font-mono text-slate-500" readonly>
+                                <span class="bg-slate-300 dark:bg-slate-600 px-3 py-2 rounded-r-lg text-xs text-slate-500 font-mono font-bold">.md</span>
                             </div>
                         </div>
 
                     </div>
                     <div class="p-4 border-t border-slate-100 dark:border-slate-800">
-                        <button onclick="publishToGitHub()" id="publish-btn" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-kvant dark:hover:bg-kvant hover:text-white transition flex justify-center items-center">
-                            <span>Отправить</span>
+                        <button onclick="publishToGitHub()" id="publish-btn" class="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-kvant dark:hover:bg-kvant hover:text-white transition flex justify-center items-center shadow-lg">
+                            <span>Сохранить в базу</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Панель ввода -->
                 <div class="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-inner h-full min-w-0">
-                    <div class="bg-slate-200 dark:bg-slate-800 px-4 py-3 flex gap-2 overflow-x-auto hide-scrollbar text-xs font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0 border-b border-slate-300 dark:border-slate-700">
+                    <div class="bg-slate-200 dark:bg-slate-800 px-4 py-3 flex gap-2 overflow-x-auto hide-scrollbar text-xs font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0 border-b border-slate-300 dark:border-slate-700 items-center">
                         <button onclick="insertTemplate('h2')" class="hover:text-kvant transition px-2">H2</button>
                         <button onclick="insertTemplate('h3')" class="hover:text-kvant transition px-2">H3</button>
-                        <div class="w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                        <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1"></div>
                         <button onclick="insertTemplate('bold')" class="hover:text-kvant transition px-2" title="Жирный"><i class="fas fa-bold"></i></button>
                         <button onclick="insertTemplate('code')" class="hover:text-kvant transition px-2" title="Блок кода"><i class="fas fa-code"></i></button>
-                        <div class="w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
-                        <button onclick="insertTemplate('quote-warn')" class="hover:text-red-500 transition px-2"><i class="fas fa-exclamation-triangle mr-1"></i> Внимание</button>
-                        <button onclick="insertTemplate('quote-tip')" class="hover:text-green-500 transition px-2"><i class="fas fa-lightbulb mr-1"></i> Лайфхак</button>
-                        <div class="w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
-                        <button onclick="insertTemplate('gallery')" class="hover:text-kvant transition px-2"><i class="fas fa-images"></i> Галерея</button>
-                        <button onclick="insertTemplate('compare')" class="hover:text-kvant transition px-2"><i class="fas fa-sliders-h"></i> До/После</button>
+                        <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                        <button onclick="insertTemplate('quote-warn')" class="hover:text-red-500 transition px-2"><i class="fas fa-exclamation-triangle mr-1"></i></button>
+                        <button onclick="insertTemplate('quote-tip')" class="hover:text-green-500 transition px-2"><i class="fas fa-lightbulb mr-1"></i></button>
+                        <div class="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                        <button onclick="insertTemplate('gallery')" class="hover:text-kvant transition px-2"><i class="fas fa-images"></i></button>
+                        <button onclick="insertTemplate('compare')" class="hover:text-kvant transition px-2"><i class="fas fa-sliders-h"></i></button>
+                        
+                        <div class="flex-1"></div> <!-- Spacer -->
+                        
+                        <!-- Кнопка загрузки картинки -->
+                        <input type="file" id="image-upload-input" accept="image/*" class="hidden" onchange="window.uploadImage(event)">
+                        <button onclick="document.getElementById('image-upload-input').click()" id="upload-img-btn" class="bg-white dark:bg-slate-700 text-kvant px-3 py-1.5 rounded flex items-center shadow-sm hover:scale-105 transition active:scale-95">
+                            <i class="fas fa-paperclip mr-2"></i> Прикрепить фото
+                        </button>
                     </div>
                     <textarea id="markdown-input" class="flex-1 w-full bg-transparent p-6 outline-none resize-none font-mono text-sm text-slate-700 dark:text-slate-300" placeholder="# Новая статья...&#10;&#10;Пишите Markdown здесь. Результат моментально появится справа."></textarea>
                 </div>
