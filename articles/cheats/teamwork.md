@@ -2,6 +2,7 @@
 title: Командная работа
 module: Workflow
 order: 1
+type: cheat
 ---
 # 🤝 Правила работы в команде
 

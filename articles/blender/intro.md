@@ -5,6 +5,7 @@ order: 1
 name: Blender
 icon: https://cdn.simpleicons.org/blender/f97316
 colorClass: bg-orange-600
+type: intro
 ---
 # Blender
 

@@ -5,6 +5,7 @@ order: 1
 name: Unreal Engine
 icon: https://cdn.simpleicons.org/unrealengine/f59e0b
 colorClass: bg-blue-700
+type: intro
 ---
 # Unreal Engine
 

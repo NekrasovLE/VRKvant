@@ -1,10 +1,15 @@
 backend:
-  name: github
+  name: git-gateway
   repo: VRARKvant/VRKvant
   branch: main
 
 media_folder: "img"
 public_folder: "img"
+
+slug:
+  encoding: "ascii"
+  clean_accents: true
+  sanitize_replacement: "-"
 
 collections:
   - name: "tracks_intro"
@@ -16,6 +21,7 @@ collections:
     create: false
     delete: false
     fields:
+      - { label: "Тип", name: "type", widget: "hidden", default: "intro" }
       - { label: "Название трека", name: "name", widget: "string" }
       - { label: "Иконка (FA или URL)", name: "icon", widget: "string" }
       - { label: "Класс цвета (Tailwind)", name: "colorClass", widget: "string" }
@@ -28,12 +34,13 @@ collections:
     label: "Уроки (Статьи)"
     folder: "articles"
     path: "{{dirname}}/{{slug}}"
-    filter: { field: "file", match: "^(?!intro|index).*" } # Исключаем intro/index
     extension: "md"
     format: "yaml-frontmatter"
     create: true
-    slug: "{{title}}"
+    slug: "{{slug}}"
+    filter: { field: "type", value: "lesson" }
     fields:
+      - { label: "Тип", name: "type", widget: "hidden", default: "lesson" }
       - { label: "Заголовок", name: "title", widget: "string" }
       - { label: "Модуль (Раздел)", name: "module", widget: "string" }
       - { label: "Порядок в списке", name: "order", widget: "number", default: 10 }
@@ -47,6 +54,7 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
+      - { label: "Тип", name: "type", widget: "hidden", default: "cheat" }
       - { label: "Заголовок", name: "title", widget: "string" }
       - { label: "Модуль", name: "module", widget: "string", default: "General" }
       - { label: "Порядок", name: "order", widget: "number", default: 1 }
@@ -60,6 +68,7 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
+      - { label: "Тип", name: "type", widget: "hidden", default: "project" }
       - { label: "Название проекта", name: "title", widget: "string" }
       - { label: "Краткое описание", name: "description", widget: "text" }
       - { label: "Авторы", name: "authors", widget: "string" }

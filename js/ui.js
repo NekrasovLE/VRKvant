@@ -22,7 +22,11 @@ window.scrollPortfolio = function(v) {
     if (el) el.scrollBy({ left: v, behavior: 'smooth' }); 
 };
 
-function groupByModule(lessons) {
+/**
+ * Вспомогательная функция для группировки уроков по модулям.
+ * Вынесена в отдельную функцию для устранения дублирования кода (Этап 2.1, Шаг 3).
+ */
+function groupLessonsByModule(lessons) {
     if (!lessons || !Array.isArray(lessons)) return {};
     return lessons.reduce((acc, lesson) => {
         const moduleName = lesson.module || 'Разное';
@@ -64,7 +68,7 @@ export async function renderTracks() {
             ? `<img src="${t.icon}" alt="icon" class="w-6 h-6 md:w-7 md:h-7 object-contain">` 
             : `<i class="${t.icon} text-lg md:text-xl"></i>`;
 
-        const modules = groupByModule(t.lessons);
+        const modules = groupLessonsByModule(t.lessons);
 
         return `
             <div class="bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-10 border border-slate-100 dark:border-slate-800">
@@ -112,7 +116,7 @@ export function buildLeftSidebar(currentPath) {
         window.siteData.tracks.forEach((t, i) => {
             const listId = `sidebar-track-list-${i}`;
             const iconId = `sidebar-track-icon-${i}`;
-            const modules = groupByModule(t.lessons);
+            const modules = groupLessonsByModule(t.lessons);
 
             html += `
             <div class="mb-1">

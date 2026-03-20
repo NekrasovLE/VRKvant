@@ -2,6 +2,7 @@
 title: Как писать статьи
 module: Workflow
 order: 2
+type: cheat
 ---
 # 📝 Полный гайд: Создание контента для VR Kvant
 
