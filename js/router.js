@@ -83,7 +83,13 @@ function parseFrontmatter(content) {
 }
 
 async function renderArticle(path) {
-    console.log("Запрос статьи по пути:", path); // Лог для отладки
+    // Нормализация пути для GitHub Pages
+    // Если путь начинается с 'articles/', убеждаемся, что он запрашивается корректно
+    let targetPath = path;
+    if (targetPath.startsWith('/')) targetPath = targetPath.substring(1);
+    
+    console.log("Запрос статьи по пути:", targetPath); 
+    
     document.querySelectorAll('.page-content').forEach(p => { p.classList.remove('active'); p.classList.add('hidden'); });
     document.getElementById('article-viewer').classList.remove('hidden');
     document.getElementById('article-viewer').classList.add('active');
@@ -93,11 +99,11 @@ async function renderArticle(path) {
     const area = document.getElementById('article-content');
     area.innerHTML = '<div class="flex justify-center p-12 md:p-20"><i class="fas fa-circle-notch fa-spin text-3xl md:text-4xl text-kvant"></i></div>';
     try {
-        const url = path + '?t=' + new Date().getTime();
+        const url = targetPath + '?t=' + new Date().getTime();
         const res = await fetch(url);
-        if (!res.ok) throw new Error(`Код ${res.status}: Файл не найден по пути "${path}"`);
+        if (!res.ok) throw new Error(`Код ${res.status}: Файл не найден по пути "${targetPath}"`);
         let text = await res.text();
-        currentDir = path.substring(0, path.lastIndexOf('/') + 1);
+        currentDir = targetPath.substring(0, targetPath.lastIndexOf('/') + 1);
         
         const { data, content } = parseFrontmatter(text);
         text = processCustomTags(content);
@@ -121,7 +127,7 @@ async function renderArticle(path) {
         interceptInternalLinks();
 
         await loadGlobalData();
-        buildLeftSidebar(path);
+        buildLeftSidebar(targetPath);
         buildToC();
         window.scrollTo(0, 0);
 
