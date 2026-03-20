@@ -1,0 +1,68 @@
+backend:
+  name: github
+  repo: VRARKvant/VRKvant
+  branch: main
+
+media_folder: "img"
+public_folder: "img"
+
+collections:
+  - name: "tracks_intro"
+    label: "Настройки треков (Intro)"
+    folder: "articles"
+    path: "{{dirname}}/intro"
+    extension: "md"
+    format: "yaml-frontmatter"
+    create: false
+    delete: false
+    fields:
+      - { label: "Название трека", name: "name", widget: "string" }
+      - { label: "Иконка (FA или URL)", name: "icon", widget: "string" }
+      - { label: "Класс цвета (Tailwind)", name: "colorClass", widget: "string" }
+      - { label: "Заголовок страницы", name: "title", widget: "string" }
+      - { label: "Модуль", name: "module", widget: "string" }
+      - { label: "Порядок", name: "order", widget: "number", default: 1 }
+      - { label: "Текст введения", name: "body", widget: "markdown" }
+
+  - name: "lessons"
+    label: "Уроки (Статьи)"
+    folder: "articles"
+    path: "{{dirname}}/{{slug}}"
+    filter: { field: "file", match: "^(?!intro|index).*" } # Исключаем intro/index
+    extension: "md"
+    format: "yaml-frontmatter"
+    create: true
+    slug: "{{title}}"
+    fields:
+      - { label: "Заголовок", name: "title", widget: "string" }
+      - { label: "Модуль (Раздел)", name: "module", widget: "string" }
+      - { label: "Порядок в списке", name: "order", widget: "number", default: 10 }
+      - { label: "Текст статьи", name: "body", widget: "markdown" }
+
+  - name: "cheats"
+    label: "Шпаргалки"
+    folder: "articles/cheats"
+    extension: "md"
+    format: "yaml-frontmatter"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Заголовок", name: "title", widget: "string" }
+      - { label: "Модуль", name: "module", widget: "string", default: "General" }
+      - { label: "Порядок", name: "order", widget: "number", default: 1 }
+      - { label: "Содержимое", name: "body", widget: "markdown" }
+
+  - name: "portfolio"
+    label: "Портфолио проектов"
+    folder: "articles/portfolio"
+    extension: "md"
+    format: "yaml-frontmatter"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Название проекта", name: "title", widget: "string" }
+      - { label: "Краткое описание", name: "description", widget: "text" }
+      - { label: "Авторы", name: "authors", widget: "string" }
+      - { label: "Обложка (путь к img/)", name: "image", widget: "image" }
+      - { label: "Теги (через запятую)", name: "tags", widget: "list" }
+      - { label: "Описание проекта", name: "body", widget: "markdown" }
