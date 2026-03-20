@@ -10,13 +10,20 @@ window.galleryData = {};
 export function initRouter() {
     initMarkdown();
     window.addEventListener("hashchange", handleRouting);
-    window.onload = () => { 
+    
+    const initApp = () => { 
         updateThemeIcons(document.documentElement.classList.contains("dark")); 
         renderPortfolio(); 
         loadGlobalData().then(() => {
             handleRouting(); 
         });
     };
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(initApp, 1);
+    } else {
+        window.addEventListener('DOMContentLoaded', initApp);
+    }
 }
 
 export async function handleRouting() {
@@ -58,7 +65,25 @@ export function goBackSafe() {
     }
 }
 
+function parseFrontmatter(content) {
+    // Улучшенное регулярное выражение для поддержки \r\n и пробелов
+    const match = content.match(/^---\s*[\r\n]+([\s\S]*?)[\r\n]+---\s*[\r\n]+/);
+    if (match) {
+        const frontmatterStr = match[1];
+        const data = {};
+        frontmatterStr.split(/\r?\n/).forEach(line => {
+            const [key, ...value] = line.split(':');
+            if (key && value.length) {
+                data[key.trim()] = value.join(':').trim().replace(/^["']|["']$/g, '');
+            }
+        });
+        return { data, content: content.slice(match[0].length) };
+    }
+    return { data: {}, content };
+}
+
 async function renderArticle(path) {
+    console.log("Запрос статьи по пути:", path); // Лог для отладки
     document.querySelectorAll('.page-content').forEach(p => { p.classList.remove('active'); p.classList.add('hidden'); });
     document.getElementById('article-viewer').classList.remove('hidden');
     document.getElementById('article-viewer').classList.add('active');
@@ -68,13 +93,27 @@ async function renderArticle(path) {
     const area = document.getElementById('article-content');
     area.innerHTML = '<div class="flex justify-center p-12 md:p-20"><i class="fas fa-circle-notch fa-spin text-3xl md:text-4xl text-kvant"></i></div>';
     try {
-        const res = await fetch(path + '?t=' + new Date().getTime());
+        const url = path + '?t=' + new Date().getTime();
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`Код ${res.status}: Файл не найден по пути "${path}"`);
         let text = await res.text();
         currentDir = path.substring(0, path.lastIndexOf('/') + 1);
         
-        text = processCustomTags(text);
-        area.innerHTML = marked.parse(text);
+        const { data, content } = parseFrontmatter(text);
+        text = processCustomTags(content);
+
+        // Оформление метаданных статьи в начале
+        let metadataHtml = "";
+        if (data.title || data.module) {
+            metadataHtml = `
+                <div class="mb-8 md:mb-12 border-b border-slate-100 dark:border-slate-800 pb-8 md:pb-10">
+                    ${data.module ? `<div class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-kvant mb-3 md:mb-4 flex items-center"><span class="w-1.5 h-1.5 bg-kvant rounded-full mr-2"></span>${data.module}</div>` : ''}
+                    <h1 class="heading-font text-3xl md:text-5xl font-bold leading-tight !mt-0 !mb-0">${data.title || "Без названия"}</h1>
+                </div>
+            `;
+        }
+
+        area.innerHTML = metadataHtml + marked.parse(text);
         
         makeHeadersCollapsible();
         styleSpecialQuotes(); 
@@ -87,12 +126,14 @@ async function renderArticle(path) {
         window.scrollTo(0, 0);
 
     } catch(e) { 
+        console.error("Ошибка в renderArticle:", e);
         area.innerHTML = `
             <div class="text-center py-10 md:py-20 px-4 md:px-6 bg-slate-50 dark:bg-slate-900 rounded-2xl md:rounded-3xl border border-red-200 dark:border-red-900/30">
                 <i class="fas fa-exclamation-triangle text-4xl md:text-5xl text-red-500 mb-4 md:mb-6 drop-shadow-lg"></i>
                 <h2 class="heading-font text-xl md:text-2xl text-slate-800 dark:text-white mb-2 md:mb-4">Ошибка загрузки статьи</h2>
                 <p class="text-sm md:text-base text-slate-500 mb-4 md:mb-6">Сайту не удалось найти или обработать файл.</p>
                 <div class="bg-red-50 dark:bg-red-950/20 p-3 md:p-4 rounded-xl border border-red-200 dark:border-red-900/50 text-left overflow-x-auto"><code class="text-xs md:text-sm font-mono text-red-600 dark:text-red-400 block whitespace-pre-wrap">${e.message}</code></div>
+                <button onclick="window.location.hash='home'" class="mt-8 bg-white dark:bg-slate-800 px-6 py-2 rounded-xl shadow-sm text-xs font-bold uppercase tracking-widest hover:scale-105 transition active:scale-95">Вернуться на главную</button>
             </div>`; 
     }
 }
