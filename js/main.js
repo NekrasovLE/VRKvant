@@ -1,9 +1,10 @@
-import { initRouter, updateEditorPreview, insertTemplate, copyEditorCode, downloadMarkdown } from './router.js';
+import { initRouter, updateEditorPreview, insertTemplate, copyEditorCode, downloadMarkdown, goBackSafe } from './router.js';
 
 // Инициализация роутера и других глобальных слушателей
 initRouter();
 
-// Экспортируем функции для использования в editor.html
+// Экспортируем функции для использования в HTML и editor.html
+window.goBackSafe = goBackSafe;
 window.updateEditorPreview = updateEditorPreview;
 window.insertTemplate = insertTemplate;
 window.copyEditorCode = copyEditorCode;
