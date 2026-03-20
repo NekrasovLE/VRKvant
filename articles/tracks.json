@@ -1,20 +1,6 @@
 {
   "tracks": [
     {
-      "id": "unity",
-      "name": "Unity",
-      "icon": "fab fa-unity",
-      "colorClass": "bg-zinc-800",
-      "lessons": [
-        {
-          "title": "Введение в Unity",
-          "file": "intro.md",
-          "module": "Основы",
-          "order": 1
-        }
-      ]
-    },
-    {
       "id": "blender",
       "name": "Blender",
       "icon": "https://cdn.simpleicons.org/blender/f97316",
@@ -36,6 +22,20 @@
       "lessons": [
         {
           "title": "Введение в Unreal Engine",
+          "file": "intro.md",
+          "module": "Основы",
+          "order": 1
+        }
+      ]
+    },
+    {
+      "id": "unity",
+      "name": "Unity",
+      "icon": "fab fa-unity",
+      "colorClass": "bg-zinc-800",
+      "lessons": [
+        {
+          "title": "Введение в Unity",
           "file": "intro.md",
           "module": "Основы",
           "order": 1
