@@ -18,10 +18,12 @@ window.toggleMobileMenu = function() {
 };
 
 window.scrollPortfolio = function(v) { 
-    document.getElementById('portfolio-carousel').scrollBy({ left: v, behavior: 'smooth' }); 
+    const el = document.getElementById('portfolio-carousel');
+    if (el) el.scrollBy({ left: v, behavior: 'smooth' }); 
 };
 
 function groupByModule(lessons) {
+    if (!lessons || !Array.isArray(lessons)) return {};
     return lessons.reduce((acc, lesson) => {
         const moduleName = lesson.module || 'Разное';
         if (!acc[moduleName]) acc[moduleName] = [];
@@ -35,7 +37,7 @@ export async function renderPortfolio() {
     const containerCarousel = document.getElementById('portfolio-carousel');
     const containerGrid = document.getElementById('projects-container');
     
-    if (projects.length === 0) {
+    if (!projects || projects.length === 0) {
         const emptyHtml = '<div class="w-full text-center py-10 opacity-30 italic text-sm">Проекты появятся здесь в ближайшее время...</div>';
         if (containerCarousel) containerCarousel.innerHTML = emptyHtml;
         if (containerGrid) containerGrid.innerHTML = emptyHtml;
@@ -44,7 +46,7 @@ export async function renderPortfolio() {
 
     const html = projects.map(p => `
         <div class="snap-center shrink-0 w-[85vw] md:w-[400px] bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-lg md:shadow-xl border border-slate-100 dark:border-slate-800 group cursor-pointer hover:-translate-y-2 transition-transform" onclick="window.location.hash='article:articles/portfolio/${p.file}'">
-            <div class="h-48 md:h-60 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">` : `<div class="w-full h-full flex items-center justify-center text-3xl md:text-4xl opacity-20"><i class="fas fa-image"></i></div>`}<div class="absolute top-4 md:top-6 left-4 md:left-6 flex gap-2">${p.tags.map(t => `<span class="bg-black/40 backdrop-blur-md text-white text-[8px] md:text-[9px] uppercase font-black px-3 md:px-4 py-1 md:py-1.5 rounded-full border border-white/20">${t}</span>`).join('')}</div></div>
+            <div class="h-48 md:h-60 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">` : `<div class="w-full h-full flex items-center justify-center text-3xl md:text-4xl opacity-20"><i class="fas fa-image"></i></div>`}<div class="absolute top-4 md:top-6 left-4 md:left-6 flex gap-2">${p.tags ? p.tags.map(t => `<span class="bg-black/40 backdrop-blur-md text-white text-[8px] md:text-[9px] uppercase font-black px-3 md:px-4 py-1 md:py-1.5 rounded-full border border-white/20">${t}</span>`).join('') : ''}</div></div>
             <div class="p-6 md:p-8"><h3 class="heading-font text-xl mb-2 md:mb-4 group-hover:text-kvant transition">${p.title}</h3><p class="text-slate-500 text-xs md:text-sm mb-4 md:mb-6 line-clamp-2">${p.description}</p><div class="flex items-center text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-user-circle mr-2 text-kvant"></i> ${p.authors}</div></div>
         </div>`).join('');
     
@@ -55,7 +57,7 @@ export async function renderPortfolio() {
 export async function renderTracks() {
     const tracks = await loadTracks();
     const container = document.getElementById('tracks-container');
-    if (!container) return;
+    if (!container || !tracks) return;
 
     container.innerHTML = tracks.map(t => {
         const iconHtml = (t.icon && t.icon.includes('/')) 
@@ -95,7 +97,7 @@ export async function renderTracks() {
 export async function renderCheats() {
     const cheats = await loadCheats();
     const container = document.getElementById('cheats-container');
-    if (!container) return;
+    if (!container || !cheats) return;
 
     container.innerHTML = cheats.map(c => `<div onclick="window.location.hash='article:articles/cheats/${c.file}'" class="p-5 md:p-8 bg-slate-50 dark:bg-slate-900 rounded-[1.25rem] md:rounded-[2rem] border border-slate-100 dark:border-slate-800 flex justify-between items-center cursor-pointer hover:bg-kvant hover:text-white transition group"><span class="font-bold text-sm md:text-base tracking-tight italic">${c.title}</span><div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 flex items-center justify-center opacity-100 md:opacity-0 group-hover:opacity-100 transition"><i class="fas fa-arrow-right text-xs md:text-base"></i></div></div>`).join('');
 }
@@ -105,7 +107,7 @@ export function buildLeftSidebar(currentPath) {
     if(!container) return;
     let html = '';
     
-    if(window.siteData.tracks) {
+    if(window.siteData && window.siteData.tracks) {
         html += `<div><h4 class="font-bold text-slate-800 dark:text-white mb-2 flex items-center"><div class="w-2 h-2 bg-kvant rounded-full mr-2"></div>Треки</h4>`;
         window.siteData.tracks.forEach((t, i) => {
             const listId = `sidebar-track-list-${i}`;
@@ -138,7 +140,7 @@ export function buildLeftSidebar(currentPath) {
         html += `</div>`;
     }
 
-    if(window.siteData.cheats) {
+    if(window.siteData && window.siteData.cheats) {
         html += `<div class="mt-8">
             <button onclick="window.toggleSidebarMenu('sidebar-cheats-list', 'sidebar-cheats-icon')" class="w-full flex items-center justify-between text-left font-bold text-slate-800 dark:text-white mb-2 hover:text-amber-500 transition-colors group">
                 <span class="flex items-center"><div class="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>Шпаргалки</span>
@@ -154,96 +156,6 @@ export function buildLeftSidebar(currentPath) {
         html += `</ul></div></div>`;
     }
     container.innerHTML = html;
-}
-
-window.toggleSidebarMenu = function(listId, iconId) {
-    const list = document.getElementById(listId);
-    const icon = document.getElementById(iconId);
-    if (!list || !icon) return;
-    if (list.classList.contains('max-h-0')) {
-        list.classList.remove('max-h-0', 'opacity-0'); list.classList.add('max-h-[2000px]', 'opacity-100'); icon.classList.remove('-rotate-90');
-    } else {
-        list.classList.add('max-h-0', 'opacity-0'); list.classList.remove('max-h-[2000px]', 'opacity-100'); icon.classList.add('-rotate-90');
-    }
-};
-
-export function buildToC() {
-    const container = document.getElementById('right-sidebar-content');
-    if(!container) return;
-    container.innerHTML = '';
-    
-    const headers = Array.from(document.querySelectorAll('#article-content h2, #article-content h3'));
-    if(headers.length === 0) { container.innerHTML = '<span class="text-slate-400 italic text-[11px]">Разделов нет</span>'; return; }
-
-    let currentH2Group = null;
-
-    headers.forEach((h, i) => {
-        const id = 'heading-' + i; h.id = id;
-        const isH3 = h.tagName === 'H3';
-        
-        if (!isH3) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'mb-2';
-            const headerRow = document.createElement('div');
-            headerRow.className = 'flex items-start justify-between group cursor-pointer';
-            const link = document.createElement('button');
-            link.className = `text-left text-sm font-bold text-slate-700 dark:text-slate-200 hover:text-kvant py-1 flex-1 pr-2 leading-snug`;
-            link.textContent = h.textContent;
-            currentH2Group = document.createElement('div');
-            currentH2Group.className = 'pl-3 border-l-2 border-slate-200 dark:border-slate-800 ml-1.5 overflow-hidden transition-all duration-300 max-h-[2000px] opacity-100';
-            const targetGroup = currentH2Group; 
-            const toggleBtn = document.createElement('button');
-            toggleBtn.innerHTML = `<i class="fas fa-chevron-down text-xs text-slate-400 transition-transform"></i>`;
-            toggleBtn.className = 'mt-0.5 w-6 h-6 shrink-0 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors opacity-0 pointer-events-none';
-            toggleBtn.onclick = (e) => {
-                e.stopPropagation();
-                const icon = toggleBtn.querySelector('i');
-                if (targetGroup.classList.contains('max-h-0')) {
-                    targetGroup.classList.remove('max-h-0', 'opacity-0');
-                    targetGroup.classList.add('max-h-[2000px]', 'opacity-100');
-                    icon.classList.remove('-rotate-90');
-                } else {
-                    targetGroup.classList.add('max-h-0', 'opacity-0');
-                    targetGroup.classList.remove('max-h-[2000px]', 'opacity-100');
-                    icon.classList.add('-rotate-90');
-                }
-            };
-            targetGroup.toggleBtn = toggleBtn;
-            link.onclick = (e) => { e.stopPropagation(); scrollToHeader(h); };
-            headerRow.onclick = () => { toggleBtn.click(); };
-            headerRow.appendChild(link);
-            headerRow.appendChild(toggleBtn);
-            wrapper.appendChild(headerRow);
-            wrapper.appendChild(targetGroup);
-            container.appendChild(wrapper);
-        } else {
-            const link = document.createElement('button');
-            if (currentH2Group) {
-                link.className = `block text-left w-full transition-colors text-xs font-semibold text-slate-500 hover:text-kvant py-1.5 mt-1`;
-                link.textContent = h.textContent;
-                link.onclick = () => scrollToHeader(h);
-                currentH2Group.appendChild(link);
-                if (currentH2Group.toggleBtn) {
-                    currentH2Group.toggleBtn.classList.remove('opacity-0', 'pointer-events-none');
-                }
-            } else {
-                link.className = `block text-left w-full transition-colors text-sm font-bold text-slate-700 dark:text-slate-200 hover:text-kvant py-1 mt-2`;
-                link.textContent = h.textContent;
-                link.onclick = () => scrollToHeader(h);
-                container.appendChild(link);
-            }
-        }
-    });
-}
-
-function scrollToHeader(h) {
-    const wrapper = h.closest('.collapsible-content');
-    if (wrapper) {
-        const parentH2 = wrapper.previousElementSibling;
-        if (parentH2 && parentH2.tagName === 'H2' && !parentH2.classList.contains('active')) { parentH2.click(); }
-    }
-    if (!h.classList.contains('active')) { h.click(); }
-    setTimeout(() => { h.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 50);
 }
 
 window.toggleSidebarMenu = function(listId, iconId) {
