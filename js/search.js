@@ -19,6 +19,7 @@ export function initSearch() {
 }
 
 export function openSearch() {
+    console.log("Вызов openSearch()");
     const modal = document.getElementById('search-modal');
     const input = document.getElementById('search-input');
     if (modal) {
@@ -29,6 +30,8 @@ export function openSearch() {
         }
         document.body.style.overflow = 'hidden'; // Блокируем скролл страницы
         renderResults([]); // Очищаем старые результаты
+    } else {
+        console.error("Элемент #search-modal не найден!");
     }
 }
 
