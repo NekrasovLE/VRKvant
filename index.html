@@ -16,6 +16,13 @@
     
     <!-- Библиотека для Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Умный поиск Fuse.js -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+
+    <!-- Граф знаний ForceGraph + D3 -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://unpkg.com/force-graph"></script>
     
     <!-- Подсветка синтаксиса Highlight.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
@@ -171,16 +178,111 @@
             </aside>
 
             <div class="flex-1 min-w-0 max-w-4xl mx-auto w-full">
-                <button id="btn-back-from-article" class="mb-6 md:mb-10 group flex items-center text-kvant font-bold uppercase text-[10px] md:text-xs tracking-[0.2em] hover:opacity-70 transition">
-                    <i class="fas fa-long-arrow-alt-left mr-3 group-hover:-translate-x-2 transition"></i> Вернуться назад
-                </button>
+                <div class="flex items-center gap-4 mb-6 md:mb-10">
+                    <div class="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 shadow-sm">
+                        <button id="btn-article-history-back" title="Назад" class="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-kvant hover:bg-white dark:hover:bg-slate-700 transition-all">
+                            <i class="fas fa-chevron-left text-sm"></i>
+                        </button>
+                        <button id="btn-article-history-forward" title="Вперед" class="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-kvant hover:bg-white dark:hover:bg-slate-700 transition-all border-l border-slate-200 dark:border-slate-700">
+                            <i class="fas fa-chevron-right text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Просмотр статьи</span>
+                </div>
                 <article id="article-content" class="prose max-w-none bg-white dark:bg-slate-900 px-5 py-8 md:p-12 lg:p-16 rounded-[1.5rem] md:rounded-[3rem] shadow-xl md:shadow-2xl border border-slate-100 dark:border-slate-800 overflow-x-hidden relative"></article>
             </div>
 
-            <aside class="hidden xl:block w-64 shrink-0 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto sidebar-scroll pl-4 pb-10 border-l border-slate-100 dark:border-slate-800/50">
-                <h3 class="heading-font text-[10px] text-slate-400 mb-6 uppercase tracking-[0.2em] font-bold"><i class="fas fa-list-ul mr-2"></i> Содержание</h3>
-                <div id="right-sidebar-content" class="space-y-1"></div>
+            <aside class="hidden xl:block w-72 shrink-0 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto sidebar-scroll pl-4 pb-10 border-l border-slate-100 dark:border-slate-800/50">
+                <div class="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 mb-6">
+                    <button id="tab-toc" title="Содержание" class="flex-1 py-2 text-xs rounded-lg bg-white dark:bg-slate-800 text-kvant shadow-sm transition active-tab">
+                        <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button id="tab-links" title="Ссылки" class="flex-1 py-2 text-xs rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+                        <i class="fas fa-link"></i>
+                    </button>
+                    <button id="tab-graph" title="Локальный граф" class="flex-1 py-2 text-xs rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+                        <i class="fas fa-dot-circle"></i>
+                    </button>
+                </div>
+
+                <div id="pane-toc" class="sidebar-pane">
+                    <h3 class="heading-font text-[10px] text-slate-400 mb-4 uppercase tracking-[0.2em] font-bold">Содержание</h3>
+                    <div id="right-sidebar-content" class="space-y-1"></div>
+                </div>
+
+                <div id="pane-links" class="sidebar-pane hidden">
+                    <h3 class="heading-font text-[10px] text-slate-400 mb-4 uppercase tracking-[0.2em] font-bold">Ссылки в тексте</h3>
+                    <div id="links-sidebar-content" class="space-y-4"></div>
+                </div>
+
+                <div id="pane-graph" class="sidebar-pane hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="heading-font text-[10px] text-slate-400 uppercase tracking-[0.2em] font-bold">Локальный граф</h3>
+                        <button id="btn-open-global-graph" title="Открыть карту знаний" class="text-kvant hover:scale-110 transition-transform text-xs">
+                            <i class="fas fa-globe"></i>
+                        </button>
+                    </div>
+                    <div id="graph-container" class="w-full h-64 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-center overflow-hidden relative"></div>
+                    <div class="mt-4 px-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Глубина связей</label>
+                            <span id="graph-depth-value" class="text-[9px] font-bold text-kvant">1</span>
+                        </div>
+                        <input type="range" id="graph-depth" min="1" max="3" value="1" class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-kvant">
+                    </div>
+                </div>
             </aside>
+
+        </div>
+    </section>
+
+    <!-- 6. ГЛОБАЛЬНЫЙ ГРАФ (Полноэкранный режим) -->
+    <section id="global-graph-view" class="page-content pt-20 md:pt-24 px-4 md:px-6 hidden min-h-screen flex-col">
+        <div class="max-w-7xl mx-auto w-full flex-1 flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-6">
+                    <div class="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 shadow-sm">
+                        <button id="btn-graph-history-back" title="Назад" class="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-kvant hover:bg-white dark:hover:bg-slate-800 transition-all">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button id="btn-graph-history-forward" title="Вперед" class="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-kvant hover:bg-white dark:hover:bg-slate-800 transition-all border-l border-slate-200 dark:border-slate-700">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <h2 class="heading-font text-2xl md:text-4xl uppercase tracking-tighter">Карта <span class="text-kvant italic">Знаний</span></h2>
+                        <p class="text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold mt-1">Интерактивная паутина обучения</p>
+                    </div>
+                </div>
+                
+                <button id="btn-close-global-graph" class="group flex items-center gap-3 bg-slate-100 dark:bg-slate-900 px-6 py-3 rounded-2xl text-slate-500 hover:text-kvant transition-all hover:scale-105 shadow-sm">
+                    <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em]">Выйти из режима карты</span>
+                </button>
+            </div>
+            
+            <div id="full-graph-container" class="flex-1 bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl overflow-hidden relative min-h-[400px] max-h-[70vh]">
+                <div class="absolute top-6 left-6 z-10 flex flex-col gap-2">
+                    <div class="bg-white/80 dark:bg-slate-950/80 backdrop-blur-md p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg pointer-events-none">
+                        <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">Легенда</div>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight"><span class="w-2.5 h-2.5 rounded-full bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.5)]"></span> Треки</div>
+                            <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight"><span class="w-2.5 h-2.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"></span> Модули</div>
+                            <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight"><span class="w-2.5 h-2.5 rounded-full bg-kvant shadow-[0_0_8px_rgba(139,92,246,0.5)]"></span> Уроки</div>
+                            <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span> Шпаргалки</div>
+                            <div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span> Проекты</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute bottom-6 right-6 z-10">
+                    <button id="btn-reset-graph" title="Центрировать" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-slate-100 dark:border-slate-800 shadow-lg text-slate-500 hover:text-kvant transition-all">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
 
         </div>
     </section>

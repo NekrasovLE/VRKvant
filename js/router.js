@@ -26,13 +26,19 @@ export function initRouter() {
     }
 }
 
+let lastHash = 'home';
+
 export async function handleRouting() {
-    const hash = window.location.hash.substring(1) || 'home';
-    if (hash.startsWith('article:')) {
-        const path = hash.substring(8);
+    const hash = window.location.hash;
+    if (hash !== '#graph') lastHash = hash || '#home';
+
+    const cleanHash = hash.substring(1) || 'home';
+    
+    if (cleanHash.startsWith('article:')) {
+        const path = cleanHash.substring(8);
         await renderArticle(path);
-    } else if (['home', 'tracks', 'cheats', 'projects', 'editor'].includes(hash)) {
-        renderPage(hash);
+    } else if (['home', 'tracks', 'cheats', 'projects', 'editor', 'graph'].includes(cleanHash)) {
+        renderPage(cleanHash);
     } else {
         window.location.hash = 'home';
     }
@@ -40,12 +46,17 @@ export async function handleRouting() {
 
 export function renderPage(pId) {
     document.getElementById('mobile-menu').classList.add('hidden-menu'); 
-    lastPage = pId; 
     
     document.querySelectorAll('.page-content').forEach(p => { 
         p.classList.remove('active'); p.classList.add('hidden'); 
-        if(p.id === pId) { p.classList.remove('hidden'); p.classList.add('active'); } 
     });
+
+    const targetSection = (pId === 'graph') ? 'global-graph-view' : pId;
+    const targetEl = document.getElementById(targetSection);
+    if (targetEl) {
+        targetEl.classList.remove('hidden');
+        targetEl.classList.add('active');
+    }
     
     document.querySelectorAll('.nav-item').forEach(n => { 
         n.classList.toggle('text-kvant', n.id === 'nav-' + pId); 
@@ -54,7 +65,18 @@ export function renderPage(pId) {
     if (pId === 'tracks') renderTracks(); 
     if (pId === 'cheats') renderCheats(); 
     if (pId === 'projects') renderPortfolio();
+    if (pId === 'graph') import('./ui.js').then(m => m.renderGlobalGraph());
+    
     window.scrollTo(0, 0);
+}
+
+export function goBackToLastHash() {
+    // Если в истории есть записи, идем назад, чтобы не создавать лишних записей хэша
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.hash = lastHash;
+    }
 }
 
 export function goBackSafe() {
@@ -110,11 +132,34 @@ async function renderArticle(path) {
 
         // Оформление метаданных статьи в начале
         let metadataHtml = "";
-        if (data.title || data.module) {
+        if (data.title || data.module || data.authors || data.tags || data.date) {
+            const tagsHtml = data.tags ? `
+                <div class="flex flex-wrap gap-2 mt-4 md:mt-6">
+                    ${(Array.isArray(data.tags) ? data.tags : data.tags.split(',')).map(t => `
+                        <span class="text-[8px] md:text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-slate-800 text-slate-500 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
+                            #${t.trim()}
+                        </span>
+                    `).join('')}
+                </div>
+            ` : '';
+
+            const authorInfo = data.authors ? `
+                <div class="flex items-center text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <i class="fas fa-user-circle mr-2 text-kvant"></i> ${data.authors}
+                    ${data.date ? `<span class="mx-3 opacity-30">|</span><i class="far fa-calendar-alt mr-2 text-kvant"></i> ${data.date}` : ''}
+                </div>
+            ` : (data.date ? `
+                <div class="flex items-center text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <i class="far fa-calendar-alt mr-2 text-kvant"></i> ${data.date}
+                </div>
+            ` : '');
+
             metadataHtml = `
                 <div class="mb-8 md:mb-12 border-b border-slate-100 dark:border-slate-800 pb-8 md:pb-10">
                     ${data.module ? `<div class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-kvant mb-3 md:mb-4 flex items-center"><span class="w-1.5 h-1.5 bg-kvant rounded-full mr-2"></span>${data.module}</div>` : ''}
-                    <h1 class="heading-font text-3xl md:text-5xl font-bold leading-tight !mt-0 !mb-0">${data.title || "Без названия"}</h1>
+                    <h1 class="heading-font text-3xl md:text-5xl font-bold leading-tight !mt-0 !mb-4">${data.title || "Без названия"}</h1>
+                    ${authorInfo}
+                    ${tagsHtml}
                 </div>
             `;
         }
@@ -128,7 +173,18 @@ async function renderArticle(path) {
 
         await loadGlobalData();
         buildLeftSidebar(targetPath);
-        buildToC();
+        
+        const ui = await import('./ui.js');
+        ui.buildToC();
+        ui.buildLinksSidebar();
+        
+        // Принудительно обновляем локальный граф при переходе на новую статью
+        // если панель графа видима или была открыта ранее
+        const graphPane = document.getElementById('pane-graph');
+        if (graphPane && !graphPane.classList.contains('hidden')) {
+            ui.renderKnowledgeGraph(true);
+        }
+        
         window.scrollTo(0, 0);
 
     } catch(e) { 

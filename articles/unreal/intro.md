@@ -3,8 +3,8 @@ title: Введение в Unreal Engine
 module: Основы
 order: 1
 name: Unreal Engine
-icon: https://cdn.simpleicons.org/unrealengine/white
-colorClass: bg-black
+icon: https://cdn.simpleicons.org/unrealengine/fff
+colorClass: bg-black dark:bg-[#0a0a0a]
 type: intro
 ---
 # Unreal Engine

@@ -62,7 +62,7 @@ export async function renderTracks() {
 
     container.innerHTML = tracks.map(t => {
         const iconHtml = (t.icon && t.icon.includes('/')) 
-            ? `<img src="${t.icon}" alt="icon" class="w-6 h-6 md:w-7 md:h-7 object-contain">` 
+            ? `<img src="${t.icon}" alt="icon" class="w-10 h-10 md:w-11 md:h-11 object-contain">` 
             : `<i class="${t.icon} text-lg md:text-xl"></i>`;
 
         const modules = groupLessonsByModule(t.lessons);
@@ -239,7 +239,310 @@ export function buildToC() {
     });
 }
 
-function scrollToHeader(h) {
+export function initSidebarTabs() {
+    const tabs = ['toc', 'links', 'graph', 'global-graph'];
+    tabs.forEach(tabId => {
+        const btn = document.getElementById(`tab-${tabId}`);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                // Переключение кнопок
+                tabs.forEach(t => {
+                    const b = document.getElementById(`tab-${t}`);
+                    if (b) {
+                        b.classList.remove('bg-white', 'dark:bg-slate-800', 'text-kvant', 'shadow-sm', 'active-tab');
+                        b.classList.add('text-slate-400');
+                    }
+                });
+                btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-kvant', 'shadow-sm', 'active-tab');
+                btn.classList.remove('text-slate-400');
+
+                // Переключение панелей
+                document.querySelectorAll('.sidebar-pane').forEach(p => p.classList.add('hidden'));
+                const pane = document.getElementById(`pane-${tabId}`);
+                if (pane) pane.classList.remove('hidden');
+                
+                if (tabId === 'graph') renderKnowledgeGraph(true);
+                if (tabId === 'global-graph') renderGlobalGraph();
+            });
+        }
+    });
+}
+
+export function buildLinksSidebar() {
+    const container = document.getElementById('links-sidebar-content');
+    const article = document.getElementById('article-content');
+    if (!container || !article) return;
+
+    const links = Array.from(article.querySelectorAll('a'));
+    if (links.length === 0) {
+        container.innerHTML = '<span class="text-slate-400 italic text-[11px]">Ссылок нет</span>';
+        return;
+    }
+
+    const internalLinks = [];
+    const externalLinks = [];
+
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        const text = link.textContent.trim() || href;
+        if (href.startsWith('http')) {
+            externalLinks.push({ text, href });
+        } else if (href.endsWith('.md')) {
+            internalLinks.push({ text, href });
+        }
+    });
+
+    let html = '';
+    if (internalLinks.length > 0) {
+        html += `
+            <div>
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center">
+                    <span class="w-1.5 h-1.5 bg-kvant rounded-full mr-2"></span> Внутренние
+                </div>
+                <div class="space-y-2">
+                    ${internalLinks.map(l => `
+                        <button data-path="article:${l.href}" class="card-link w-full text-left text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-kvant transition line-clamp-2">
+                            <i class="fas fa-file-alt mr-2 opacity-40"></i> ${l.text}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    if (externalLinks.length > 0) {
+        html += `
+            <div class="mt-6">
+                <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center">
+                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span> Внешние ресурсы
+                </div>
+                <div class="space-y-2">
+                    ${externalLinks.map(l => `
+                        <a href="${l.href}" target="_blank" class="block w-full text-left text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-500 transition line-clamp-2">
+                            <i class="fas fa-external-link-alt mr-2 opacity-40"></i> ${l.text}
+                        </a>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html || '<span class="text-slate-400 italic text-[11px]">Ссылок нет</span>';
+}
+
+let currentLocalGraph = null;
+let currentGlobalGraph = null;
+let currentGraphPath = null;
+
+export async function renderKnowledgeGraph(forceRedraw = false) {
+    const container = document.getElementById('graph-container');
+    if (!container) return;
+
+    const hash = window.location.hash;
+    const isArticle = hash.startsWith('#article:');
+    const articlePath = isArticle ? hash.substring(9) : null;
+    const depth = parseInt(document.getElementById('graph-depth')?.value || 1);
+
+    if (!forceRedraw && currentLocalGraph && currentGraphPath === articlePath && container.querySelector('canvas')) return;
+
+    container.innerHTML = '<div class="flex flex-col items-center justify-center h-full opacity-30"><i class="fas fa-circle-notch fa-spin text-xl mb-2"></i><span class="text-[9px] uppercase font-bold tracking-widest">Загрузка...</span></div>';
+
+    try {
+        const res = await fetch('articles/graph.json');
+        if (!res.ok) throw new Error('Failed to fetch graph.json');
+        const fullData = await res.json();
+        container.innerHTML = ''; 
+        currentGraphPath = articlePath;
+
+        let displayData = fullData;
+        if (articlePath) {
+            const startNode = fullData.nodes.find(n => n.path === articlePath);
+            if (startNode) {
+                const visibleNodeIds = new Set([startNode.id]);
+                let currentLevelIds = new Set([startNode.id]);
+
+                for (let i = 0; i < depth; i++) {
+                    const nextLevelIds = new Set();
+                    fullData.links.forEach(link => {
+                        const s = typeof link.source === 'object' ? link.source.id : link.source;
+                        const t = typeof link.target === 'object' ? link.target.id : link.target;
+                        if (currentLevelIds.has(s)) { visibleNodeIds.add(t); nextLevelIds.add(t); }
+                        if (currentLevelIds.has(t)) { visibleNodeIds.add(s); nextLevelIds.add(s); }
+                    });
+                    currentLevelIds = nextLevelIds;
+                }
+
+                displayData = {
+                    nodes: fullData.nodes.filter(n => visibleNodeIds.has(n.id)),
+                    links: fullData.links.filter(l => {
+                        const s = typeof l.source === 'object' ? l.source.id : l.source;
+                        const t = typeof l.target === 'object' ? l.target.id : l.target;
+                        return visibleNodeIds.has(s) && visibleNodeIds.has(t);
+                    })
+                };
+            }
+        }
+
+        currentLocalGraph = createBaseGraph(container, displayData, articlePath);
+    } catch (e) { 
+        console.error("Local Graph Error:", e); 
+        container.innerHTML = `<div class="text-[10px] text-red-400 p-4 text-center">Ошибка графа: ${e.message}</div>`; 
+    }
+}
+
+export async function renderGlobalGraph() {
+    const container = document.getElementById('full-graph-container');
+    if (!container) return;
+
+    // Очищаем старый холст для корректного перерендера при изменении размеров
+    container.innerHTML = '<div class="flex flex-col items-center justify-center h-full opacity-30"><i class="fas fa-circle-notch fa-spin text-xl mb-2"></i><span class="text-[9px] uppercase font-bold tracking-widest">Сборка карты...</span></div>';
+
+    try {
+        const res = await fetch('articles/graph.json');
+        if (!res.ok) throw new Error('Failed to fetch graph.json');
+        const data = await res.json();
+        
+        // Даем браузеру время отрисовать контейнер, чтобы получить его размеры
+        setTimeout(() => {
+            container.innerHTML = '';
+            currentGlobalGraph = createBaseGraph(container, data, null, true);
+        }, 50);
+    } catch (e) { 
+        console.error("Global Graph Error:", e); 
+        container.innerHTML = `<div class="text-[10px] text-red-400 p-4 text-center">Ошибка загрузки карты знаний: ${e.message}</div>`; 
+    }
+}
+
+export function resetGlobalGraph() {
+    if (currentGlobalGraph) {
+        currentGlobalGraph.zoomToFit(400, 50);
+    }
+}
+
+function createBaseGraph(container, data, highlightPath, isGlobal = false) {
+    if (!data || !data.nodes || data.nodes.length === 0) {
+        container.innerHTML = '<div class="text-[10px] text-slate-400 p-4 text-center italic">Нет данных для отображения</div>';
+        return null;
+    }
+
+    const isDark = document.documentElement.classList.contains('dark');
+    
+    // Фирменная палитра проекта
+    const colors = {
+        lesson: '#8b5cf6',    // kvant violet (основной)
+        cheat: '#f59e0b',     // amber (шпаргалки)
+        project: '#10b981',   // emerald (проекты)
+        external: '#3b82f6',  // blue (внешние)
+        track: '#a855f7',     // purple (треки - чуть ярче основного)
+        module: '#6366f1',    // indigo (модули)
+        category: '#475569',  // slate-600 (категории)
+        missing: isDark ? 'rgba(148, 163, 184, 0.2)' : 'rgba(148, 163, 184, 0.4)',
+        default: '#94a3b8',   // slate-400
+        link: isDark ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)', // Увеличена видимость связей
+        text: isDark ? '#94a3b8' : '#64748b',
+        highlight: '#8b5cf6'  // Текущая нода
+    };
+
+    const graph = ForceGraph()(container)
+        .graphData(data)
+        .width(container.offsetWidth || 800)
+        .height(container.offsetHeight || 600)
+        .nodeRelSize(isGlobal ? 3 : 4)
+        .cooldownTicks(isGlobal ? 50 : 30)
+        .warmupTicks(10)
+        .nodeLabel(node => `<div class="bg-slate-900 text-white px-2 py-1 rounded text-[10px] border border-white/10 shadow-xl">${node.title}${node.type === 'missing' ? ' (не создана)' : ''}</div>`)
+        .nodeColor(node => node.path === highlightPath ? colors.highlight : (colors[node.type] || colors.default))
+        .linkColor(() => colors.link)
+        .linkWidth(link => isGlobal ? 1 : 1.5) // Увеличена ширина линий
+        .onNodeClick(node => {
+            if (node.type === 'missing' || node.type === 'category') return;
+            const targetPath = node.url || node.path;
+            if (node.type === 'external') window.open(targetPath, '_blank');
+            else window.location.hash = `article:${targetPath}`;
+        })
+        .nodeCanvasObject((node, ctx, globalScale) => {
+            const isCurrent = node.path === highlightPath;
+            const isGroup = ['track', 'module', 'category'].includes(node.type);
+            const isMissing = node.type === 'missing';
+            
+            // Размер узлов
+            let radius = 3.5;
+            if (isCurrent) radius = 6;
+            else if (node.type === 'track') radius = 7;
+            else if (node.type === 'module') radius = 5;
+            else if (node.type === 'category') radius = 5;
+            
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
+            
+            // Заливка
+            ctx.fillStyle = isCurrent ? colors.highlight : (colors[node.type] || colors.default);
+            ctx.fill();
+
+            // Обводка для важных узлов
+            if (isCurrent || isGroup) {
+                ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.2)';
+                ctx.lineWidth = (isGroup ? 2 : 1.5) / globalScale;
+                ctx.stroke();
+                
+                // Дополнительное свечение для треков
+                if (node.type === 'track') {
+                    ctx.shadowBlur = 15 / globalScale;
+                    ctx.shadowColor = ctx.fillStyle;
+                }
+            } else if (isMissing) {
+                ctx.strokeStyle = colors.text;
+                ctx.setLineDash([2, 2]);
+                ctx.lineWidth = 0.5/globalScale;
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
+            ctx.shadowBlur = 0; // Reset shadow
+
+            // Текст (подписи)
+            if (globalScale > (isGlobal ? 3.5 : 2) || isCurrent || isGroup) {
+                const fontSize = (isGroup ? 11 : 10) / globalScale;
+                ctx.font = `${isGroup ? '900' : '500'} ${fontSize}px Inter, system-ui, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                
+                // Цвет текста
+                if (isCurrent) ctx.fillStyle = colors.highlight;
+                else if (node.type === 'track') ctx.fillStyle = isDark ? '#fff' : '#1e293b';
+                else ctx.fillStyle = colors.text;
+
+                if (isMissing) ctx.globalAlpha = 0.4;
+                
+                // Рисуем текст с небольшой подложкой для читаемости
+                const label = node.title;
+                ctx.fillText(label, node.x, node.y + radius + 2.5);
+                ctx.globalAlpha = 1.0;
+            }
+        });
+
+    // Повышенная стабильность и защита от "улетания"
+    graph.d3AlphaDecay(0.05); // Быстрее засыпает
+    graph.d3VelocityDecay(0.6); // Очень сильное гашение скорости
+
+    if (window.d3) {
+        graph.d3Force('center', d3.forceCenter(container.offsetWidth / 2, container.offsetHeight / 2));
+        graph.d3Force('charge', d3.forceManyBody().strength(isGlobal ? -80 : -120).distanceMax(400));
+        graph.d3Force('link', d3.forceLink().distance(isGlobal ? 40 : 60).id(d => d.id));
+    }
+
+    // Принудительное центрирование камеры в начале
+    setTimeout(() => {
+        graph.zoomToFit(400, 100);
+    }, 100);
+
+    graph.enableNodeDrag(true);
+    graph.enableZoomInteraction(true);
+
+    return graph;
+}
+
+export function scrollToHeader(h) {
     const wrapper = h.closest('.collapsible-content');
     if (wrapper) {
         const parentH2 = wrapper.previousElementSibling;

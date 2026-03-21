@@ -1,0 +1,130 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "title": "База знаний",
+      "path": "category:cheats",
+      "type": "category"
+    },
+    {
+      "id": 2,
+      "title": "Портфолио",
+      "path": "category:portfolio",
+      "type": "category"
+    },
+    {
+      "id": 3,
+      "title": "Blender",
+      "path": "articles/blender/intro.md",
+      "type": "track"
+    },
+    {
+      "id": 4,
+      "title": "Горячие клавиши Blender",
+      "path": "articles/cheats/blender_keys.md",
+      "type": "cheat"
+    },
+    {
+      "id": 5,
+      "title": "Настройка Meta Quest",
+      "path": "articles/cheats/quest_setup.md",
+      "type": "cheat"
+    },
+    {
+      "id": 6,
+      "title": "Командная работа",
+      "path": "articles/cheats/teamwork.md",
+      "type": "cheat"
+    },
+    {
+      "id": 7,
+      "title": "Как писать статьи",
+      "path": "articles/cheats/writing_articles.md",
+      "type": "cheat"
+    },
+    {
+      "id": 8,
+      "title": "Unity",
+      "path": "articles/unity/intro.md",
+      "type": "track"
+    },
+    {
+      "id": 9,
+      "title": "Unreal Engine",
+      "path": "articles/unreal/intro.md",
+      "type": "track"
+    },
+    {
+      "id": 10,
+      "title": "сайта]([url",
+      "path": "https://blueprintue.com",
+      "type": "external"
+    },
+    {
+      "id": 11,
+      "title": "скачать Unity Hub",
+      "path": "https://unity.com/download",
+      "type": "external"
+    },
+    {
+      "id": 12,
+      "title": "Основы переменных и интерфейса",
+      "path": "articles/unreal/module_1.md",
+      "type": "missing"
+    },
+    {
+      "id": 13,
+      "title": "Логика и ветвление в Blueprints",
+      "path": "articles/unreal/module_2.md",
+      "type": "missing"
+    },
+    {
+      "id": 14,
+      "title": "Создание VR-взаимодействий",
+      "path": "articles/unreal/module_7.md",
+      "type": "missing"
+    }
+  ],
+  "links": [
+    {
+      "source": 4,
+      "target": 1
+    },
+    {
+      "source": 5,
+      "target": 1
+    },
+    {
+      "source": 6,
+      "target": 1
+    },
+    {
+      "source": 7,
+      "target": 1
+    },
+    {
+      "source": 7,
+      "target": 10
+    },
+    {
+      "source": 7,
+      "target": 11
+    },
+    {
+      "source": 7,
+      "target": 11
+    },
+    {
+      "source": 9,
+      "target": 12
+    },
+    {
+      "source": 9,
+      "target": 13
+    },
+    {
+      "source": 9,
+      "target": 14
+    }
+  ]
+}

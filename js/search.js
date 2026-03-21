@@ -1,4 +1,7 @@
-export function initSearch() {
+let fuse = null;
+let searchIndex = [];
+
+export async function initSearch() {
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => performSearch(e.target.value));
@@ -38,6 +41,25 @@ export function initSearch() {
             }
         });
     }
+
+    // Предзагрузка индекса
+    try {
+        const res = await fetch('articles/search_index.json');
+        searchIndex = await res.json();
+        
+        // Инициализация Fuse.js
+        fuse = new Fuse(searchIndex, {
+            keys: [
+                { name: 'title', weight: 0.7 },
+                { name: 'content', weight: 0.3 }
+            ],
+            threshold: 0.4, // Баланс между точностью и прощением опечаток
+            includeMatches: true,
+            minMatchCharLength: 2
+        });
+    } catch (e) {
+        console.error("Ошибка загрузки индекса поиска:", e);
+    }
 }
 
 export function openSearch() {
@@ -63,59 +85,18 @@ export function closeSearch() {
 }
 
 function performSearch(query) {
-    if (!query.trim()) {
+    if (!query.trim() || !fuse) {
         renderResults([]);
         return;
     }
 
-    const q = query.toLowerCase();
-    const results = [];
+    const fuseResults = fuse.search(query);
+    const results = fuseResults.map(r => ({
+        ...r.item,
+        score: r.score
+    }));
 
-    if (window.siteData.tracks) {
-        window.siteData.tracks.forEach(track => {
-            track.lessons.forEach(lesson => {
-                if (lesson.title.toLowerCase().includes(q) || (lesson.module && lesson.module.toLowerCase().includes(q))) {
-                    results.push({
-                        title: lesson.title,
-                        type: 'Урок',
-                        category: track.name,
-                        path: `article:articles/${track.id}/${lesson.file}`,
-                        icon: 'fas fa-book-open'
-                    });
-                }
-            });
-        });
-    }
-
-    if (window.siteData.cheats) {
-        window.siteData.cheats.forEach(cheat => {
-            if (cheat.title.toLowerCase().includes(q)) {
-                results.push({
-                    title: cheat.title,
-                    type: 'Шпаргалка',
-                    category: 'База знаний',
-                    path: `article:articles/cheats/${cheat.file}`,
-                    icon: 'fas fa-bolt'
-                });
-            }
-        });
-    }
-
-    if (window.siteData.portfolio) {
-        window.siteData.portfolio.forEach(project => {
-            if (project.title.toLowerCase().includes(q) || (project.description && project.description.toLowerCase().includes(q))) {
-                results.push({
-                    title: project.title,
-                    type: 'Проект',
-                    category: 'Портфолио',
-                    path: `article:articles/portfolio/${project.file}`,
-                    icon: 'fas fa-project-diagram'
-                });
-            }
-        });
-    }
-
-    renderResults(results);
+    renderResults(results.slice(0, 10)); // Топ-10 результатов
 }
 
 function renderResults(results) {

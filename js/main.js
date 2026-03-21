@@ -1,12 +1,13 @@
 import { initRouter, updateEditorPreview, insertTemplate, copyEditorCode, downloadMarkdown, goBackSafe } from './router.js';
 import { initSearch, openSearch, closeSearch } from './search.js';
 import { initGithubAuth, publishToGitHub, uploadImage } from './github.js';
-import { toggleTheme, toggleMobileMenu, scrollPortfolio } from './ui.js';
+import { toggleTheme, toggleMobileMenu, scrollPortfolio, initSidebarTabs } from './ui.js';
 
 /**
  * Инициализация всех слушателей событий (Stage 5: Eliminate Scope Pollution)
  */
 function initEvents() {
+    initSidebarTabs();
     // Навигация
     document.getElementById('nav-logo')?.addEventListener('click', () => window.location.hash = 'home');
     document.getElementById('nav-home')?.addEventListener('click', () => window.location.hash = 'home');
@@ -39,6 +40,30 @@ function initEvents() {
 
     // Просмотр статьи
     document.getElementById('btn-back-from-article')?.addEventListener('click', goBackSafe);
+    document.getElementById('btn-article-history-back')?.addEventListener('click', () => window.history.back());
+    document.getElementById('btn-article-history-forward')?.addEventListener('click', () => window.history.forward());
+    
+    document.getElementById('btn-open-global-graph')?.addEventListener('click', () => {
+        window.location.hash = 'graph';
+    });
+    
+    document.getElementById('btn-close-global-graph')?.addEventListener('click', () => {
+        import('./router.js').then(m => m.goBackToLastHash());
+    });
+
+    document.getElementById('btn-reset-graph')?.addEventListener('click', () => {
+        import('./ui.js').then(m => m.resetGlobalGraph());
+    });
+
+    document.getElementById('btn-graph-history-back')?.addEventListener('click', () => window.history.back());
+    document.getElementById('btn-graph-history-forward')?.addEventListener('click', () => window.history.forward());
+
+    document.getElementById('graph-depth')?.addEventListener('input', (e) => {
+        const val = e.target.value;
+        const display = document.getElementById('graph-depth-value');
+        if (display) display.textContent = val;
+        import('./ui.js').then(m => m.renderKnowledgeGraph());
+    });
 
     // Делегирование для карточек и ссылок (динамический контент)
     document.addEventListener('click', (e) => {
