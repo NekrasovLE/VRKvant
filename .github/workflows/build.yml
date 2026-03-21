@@ -70,33 +70,28 @@ jobs:
         run: npm run test
         continue-on-error: true
 
-      - name: 📝 Vitest Detailed Summary
-        if: always()
-        run: |
-          echo "### 🧪 Результаты Unit-тестов" >> $GITHUB_STEP_SUMMARY
-          echo "| Тест | Статус | Время |" >> $GITHUB_STEP_SUMMARY
-          echo "| :--- | :---: | :--- |" >> $GITHUB_STEP_SUMMARY
+    - name: 📝 Vitest Detailed Summary
+      if: always()
+      run: |
+        echo "### 🧪 Результаты Unit-тестов" >> $GITHUB_STEP_SUMMARY
+        echo "| Тест | Статус | Время |" >> $GITHUB_STEP_SUMMARY
+        echo "| :--- | :---: | :--- |" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f test-results/vitest-results.xml ]; then
+          # Используем perl для надежного парсинга многострочного XML
+          perl -0777 -ne 'while (/<testcase\s+name="([^"]+)"[^>]*?time="([^"]+)"[^>]*?>(.*?)(<\/testcase>|\/>)/gs) { 
+            $n=$1; $t=$2; $c=$3; $s = ($c =~ /<failure/) ? "❌" : "✅"; 
+            print "| $n | $s | ${t}s |\n"; 
+          }' test-results/vitest-results.xml >> $GITHUB_STEP_SUMMARY
           
-          if [ -f test-results/vitest-results.xml ]; then
-            # Извлекаем каждый тест-кейс
-            grep -E '<testcase' test-results/vitest-results.xml | while read -r line; do
-              NAME=$(echo "$line" | grep -o 'name="[^"]*"' | cut -d'"' -f2)
-              TIME=$(echo "$line" | grep -o 'time="[^"]*"' | cut -d'"' -f2)
-              if echo "$line" | grep -q '<failure'; then
-                echo "| $NAME | ❌ | ${TIME}s |" >> $GITHUB_STEP_SUMMARY
-              else
-                echo "| $NAME | ✅ | ${TIME}s |" >> $GITHUB_STEP_SUMMARY
-              fi
-            done
-            
-            # Итоговая строка
-            TOTAL=$(grep -o 'tests="[^"]*"' test-results/vitest-results.xml | head -1 | cut -d'"' -f2)
-            FAILURES=$(grep -o 'failures="[^"]*"' test-results/vitest-results.xml | head -1 | cut -d'"' -f2)
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Всего тестов:** $TOTAL | **Упало:** $FAILURES" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| ⚠️ Ошибка | Файл отчета не найден | - |" >> $GITHUB_STEP_SUMMARY
-          fi
+          # Итоговая строка
+          TOTAL=$(grep -o 'tests="[^"]*"' test-results/vitest-results.xml | head -1 | cut -d'"' -f2)
+          FAILURES=$(grep -o 'failures="[^"]*"' test-results/vitest-results.xml | head -1 | cut -d'"' -f2)
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Всего тестов:** $TOTAL | **Упало:** $FAILURES" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| ⚠️ Ошибка | Файл отчета не найден | - |" >> $GITHUB_STEP_SUMMARY
+        fi
 
       - name: Publish Vitest Test Report
         uses: dorny/test-reporter@v1
@@ -158,33 +153,28 @@ jobs:
         run: npm run test:e2e
         continue-on-error: true
 
-      - name: 📝 Playwright Detailed Summary
-        if: always()
-        run: |
-          echo "### 🎭 Результаты E2E-тестов" >> $GITHUB_STEP_SUMMARY
-          echo "| Тест | Статус | Время |" >> $GITHUB_STEP_SUMMARY
-          echo "| :--- | :---: | :--- |" >> $GITHUB_STEP_SUMMARY
+    - name: 📝 Playwright Detailed Summary
+      if: always()
+      run: |
+        echo "### 🎭 Результаты E2E-тестов" >> $GITHUB_STEP_SUMMARY
+        echo "| Тест | Статус | Время |" >> $GITHUB_STEP_SUMMARY
+        echo "| :--- | :---: | :--- |" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f test-results/playwright-results.xml ]; then
+          # Используем perl для надежного парсинга многострочного XML
+          perl -0777 -ne 'while (/<testcase\s+name="([^"]+)"[^>]*?time="([^"]+)"[^>]*?>(.*?)(<\/testcase>|\/>)/gs) { 
+            $n=$1; $t=$2; $c=$3; $s = ($c =~ /<failure/) ? "❌" : "✅"; 
+            print "| $n | $s | ${t}s |\n"; 
+          }' test-results/playwright-results.xml >> $GITHUB_STEP_SUMMARY
           
-          if [ -f test-results/playwright-results.xml ]; then
-            # Извлекаем каждый тест-кейс из Playwright JUnit
-            grep -E '<testcase' test-results/playwright-results.xml | while read -r line; do
-              NAME=$(echo "$line" | grep -o 'name="[^"]*"' | cut -d'"' -f2)
-              TIME=$(echo "$line" | grep -o 'time="[^"]*"' | cut -d'"' -f2)
-              if echo "$line" | grep -q '<failure'; then
-                echo "| $NAME | ❌ | ${TIME}s |" >> $GITHUB_STEP_SUMMARY
-              else
-                echo "| $NAME | ✅ | ${TIME}s |" >> $GITHUB_STEP_SUMMARY
-              fi
-            done
-            
-            # Итоговая строка
-            TOTAL=$(grep -o 'tests="[^"]*"' test-results/playwright-results.xml | head -1 | cut -d'"' -f2)
-            FAILURES=$(grep -o 'failures="[^"]*"' test-results/playwright-results.xml | head -1 | cut -d'"' -f2)
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Всего E2E тестов:** $TOTAL | **Упало:** $FAILURES" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| ⚠️ Ошибка | Файл отчета не найден | - |" >> $GITHUB_STEP_SUMMARY
-          fi
+          # Итоговая строка
+          TOTAL=$(grep -o 'tests="[^"]*"' test-results/playwright-results.xml | head -1 | cut -d'"' -f2)
+          FAILURES=$(grep -o 'failures="[^"]*"' test-results/playwright-results.xml | head -1 | cut -d'"' -f2)
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Всего E2E тестов:** $TOTAL | **Упало:** $FAILURES" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| ⚠️ Ошибка | Файл отчета не найден | - |" >> $GITHUB_STEP_SUMMARY
+        fi
 
       - name: Publish Playwright Test Report
         uses: dorny/test-reporter@v1
