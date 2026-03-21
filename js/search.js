@@ -44,7 +44,7 @@ export async function initSearch() {
 
     // Предзагрузка индекса
     try {
-        const res = await fetch('articles/search_index.json');
+        const res = await fetch('./articles/search_index.json');
         searchIndex = await res.json();
         
         // Инициализация Fuse.js

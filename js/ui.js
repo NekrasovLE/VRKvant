@@ -1,5 +1,6 @@
 import { loadPortfolio, loadTracks, loadCheats } from './api.js';
 import { isLessonRead, getTrackProgress } from './progress.js';
+import { store } from './store.js';
 
 export function updateThemeIcons(isDark) { 
     const icon = document.getElementById('theme-icon'); 
@@ -412,7 +413,7 @@ export async function renderKnowledgeGraph(forceRedraw = false) {
     container.innerHTML = '<div class="flex flex-col items-center justify-center h-full opacity-30"><i class="fas fa-circle-notch fa-spin text-xl mb-2"></i><span class="text-[9px] uppercase font-bold tracking-widest">Загрузка...</span></div>';
 
     try {
-        const res = await fetch('articles/graph.json');
+        const res = await fetch('./articles/graph.json');
         if (!res.ok) throw new Error('Failed to fetch graph.json');
         const fullData = await res.json();
         container.innerHTML = ''; 
@@ -462,7 +463,7 @@ export async function renderGlobalGraph() {
     container.innerHTML = '<div class="flex flex-col items-center justify-center h-full opacity-30"><i class="fas fa-circle-notch fa-spin text-xl mb-2"></i><span class="text-[9px] uppercase font-bold tracking-widest">Сборка карты...</span></div>';
 
     try {
-        const res = await fetch('articles/graph.json');
+        const res = await fetch('./articles/graph.json');
         if (!res.ok) throw new Error('Failed to fetch graph.json');
         const data = await res.json();
         

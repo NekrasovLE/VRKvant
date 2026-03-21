@@ -56,6 +56,7 @@ export async function handleRouting() {
  */
 export function renderPage(pId) {
     document.getElementById('mobile-menu').classList.add('hidden-menu'); 
+    if (pId !== 'graph') store.lastPage = pId;
     
     document.querySelectorAll('.page-content').forEach(p => { 
         p.classList.remove('active'); p.classList.add('hidden'); 
@@ -124,16 +125,18 @@ function parseFrontmatter(content) {
 }
 
 async function renderArticle(path) {
-    // Нормализация пути для GitHub Pages
+    // Нормализация пути
     let targetPath = path;
     if (targetPath.startsWith('/')) targetPath = targetPath.substring(1);
     
-    // Гарантируем, что путь начинается с 'articles/'
+    // Если путь еще не содержит articles/, добавляем его
     if (!targetPath.startsWith('articles/')) {
         targetPath = 'articles/' + targetPath;
     }
     
-    console.log("Запрос статьи по пути:", targetPath); 
+    // Убеждаемся, что путь начинается с ./ для относительного запроса
+    const fetchPath = targetPath.startsWith('./') ? targetPath : './' + targetPath;
+    console.log("Fetching article:", fetchPath); 
     
     document.querySelectorAll('.page-content').forEach(p => { p.classList.remove('active'); p.classList.add('hidden'); });
     document.getElementById('article-viewer').classList.remove('hidden');
@@ -144,9 +147,9 @@ async function renderArticle(path) {
     const area = document.getElementById('article-content');
     area.innerHTML = '<div class="flex justify-center p-12 md:p-20"><i class="fas fa-circle-notch fa-spin text-3xl md:text-4xl text-kvant"></i></div>';
     try {
-        const url = targetPath + '?t=' + new Date().getTime();
+        const url = fetchPath + '?t=' + new Date().getTime();
         const res = await fetch(url);
-        if (!res.ok) throw new Error(`Код ${res.status}: Файл не найден по пути "${targetPath}"`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}: Файл не найден по пути "${fetchPath}"`);
         let text = await res.text();
         currentDir = targetPath.substring(0, targetPath.lastIndexOf('/') + 1);
         

@@ -1,9 +1,9 @@
 import { store } from './store.js';
 
 export const CONFIG = { 
-    tracks: 'articles/tracks.json', 
-    cheats: 'articles/cheats.json', 
-    portfolio: 'articles/portfolio.json' 
+    tracks: './articles/tracks.json', 
+    cheats: './articles/cheats.json', 
+    portfolio: './articles/portfolio.json' 
 };
 
 export async function loadGlobalData() {

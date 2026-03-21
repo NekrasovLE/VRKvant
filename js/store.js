@@ -23,6 +23,9 @@ export const store = new Proxy(state, {
     }
 });
 
+// Глобальный доступ для отладки и надежности
+window.store = store;
+
 export function subscribe(fn) {
     listeners.push(fn);
 }
