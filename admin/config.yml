@@ -2,7 +2,7 @@ backend:
   name: github
   repo: VRARKvant/VRKvant
   branch: main
-  base_url: https://vrkvant.vercel.app # Замените на ваш актуальный домен Vercel
+  base_url: https://vr-kvant.vercel.app # Замените на ваш актуальный домен Vercel
   auth_endpoint: api/auth
 
 site_url: https://vrarkvant.github.io/VRKvant/
