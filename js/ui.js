@@ -7,25 +7,22 @@ export function updateThemeIcons(isDark) {
     if (iconMobile) iconMobile.classList.replace(isDark ? 'fa-moon' : 'fa-sun', isDark ? 'fa-sun' : 'fa-moon'); 
 }
 
-window.toggleTheme = function() { 
+export function toggleTheme() { 
     const isDark = document.documentElement.classList.toggle('dark'); 
     localStorage.setItem('theme', isDark ? 'dark' : 'light'); 
     updateThemeIcons(isDark); 
-};
+}
 
-window.toggleMobileMenu = function() { 
-    document.getElementById('mobile-menu').classList.toggle('hidden-menu'); 
-};
+export function toggleMobileMenu() { 
+    const menu = document.getElementById('mobile-menu');
+    if (menu) menu.classList.toggle('hidden-menu'); 
+}
 
-window.scrollPortfolio = function(v) { 
+export function scrollPortfolio(v) { 
     const el = document.getElementById('portfolio-carousel');
     if (el) el.scrollBy({ left: v, behavior: 'smooth' }); 
-};
+}
 
-/**
- * Вспомогательная функция для группировки уроков по модулям.
- * Вынесена в отдельную функцию для устранения дублирования кода (Этап 2.1, Шаг 3).
- */
 function groupLessonsByModule(lessons) {
     if (!lessons || !Array.isArray(lessons)) return {};
     return lessons.reduce((acc, lesson) => {
@@ -49,7 +46,7 @@ export async function renderPortfolio() {
     }
 
     const html = projects.map(p => `
-        <div class="snap-center shrink-0 w-[85vw] md:w-[400px] bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-lg md:shadow-xl border border-slate-100 dark:border-slate-800 group cursor-pointer hover:-translate-y-2 transition-transform" onclick="window.location.hash='article:articles/portfolio/${p.file}'">
+        <div data-path="article:articles/portfolio/${p.file}" class="card-link snap-center shrink-0 w-[85vw] md:w-[400px] bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-lg md:shadow-xl border border-slate-100 dark:border-slate-800 group cursor-pointer hover:-translate-y-2 transition-transform">
             <div class="h-48 md:h-60 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">` : `<div class="w-full h-full flex items-center justify-center text-3xl md:text-4xl opacity-20"><i class="fas fa-image"></i></div>`}<div class="absolute top-4 md:top-6 left-4 md:left-6 flex gap-2">${p.tags ? p.tags.map(t => `<span class="bg-black/40 backdrop-blur-md text-white text-[8px] md:text-[9px] uppercase font-black px-3 md:px-4 py-1 md:py-1.5 rounded-full border border-white/20">${t}</span>`).join('') : ''}</div></div>
             <div class="p-6 md:p-8"><h3 class="heading-font text-xl mb-2 md:mb-4 group-hover:text-kvant transition">${p.title}</h3><p class="text-slate-500 text-xs md:text-sm mb-4 md:mb-6 line-clamp-2">${p.description}</p><div class="flex items-center text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-user-circle mr-2 text-kvant"></i> ${p.authors}</div></div>
         </div>`).join('');
@@ -85,7 +82,7 @@ export async function renderTracks() {
                             </h4>
                             <div class="space-y-2 md:space-y-3">
                                 ${moduleLessons.map(l => `
-                                    <div onclick="window.location.hash='article:articles/${t.id}/${l.file}'" class="p-4 md:p-5 bg-white dark:bg-slate-800 rounded-xl md:rounded-2xl flex justify-between items-center cursor-pointer hover:ring-2 md:hover:ring-4 ring-kvant/20 transition group">
+                                    <div data-path="article:articles/${t.id}/${l.file}" class="card-link p-4 md:p-5 bg-white dark:bg-slate-800 rounded-xl md:rounded-2xl flex justify-between items-center cursor-pointer hover:ring-2 md:hover:ring-4 ring-kvant/20 transition group">
                                         <span class="font-bold text-xs md:text-sm group-hover:text-kvant transition">${l.title}</span>
                                         <i class="fas fa-chevron-right text-[10px] opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition"></i>
                                     </div>
@@ -103,7 +100,7 @@ export async function renderCheats() {
     const container = document.getElementById('cheats-container');
     if (!container || !cheats) return;
 
-    container.innerHTML = cheats.map(c => `<div onclick="window.location.hash='article:articles/cheats/${c.file}'" class="p-5 md:p-8 bg-slate-50 dark:bg-slate-900 rounded-[1.25rem] md:rounded-[2rem] border border-slate-100 dark:border-slate-800 flex justify-between items-center cursor-pointer hover:bg-kvant hover:text-white transition group"><span class="font-bold text-sm md:text-base tracking-tight italic">${c.title}</span><div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 flex items-center justify-center opacity-100 md:opacity-0 group-hover:opacity-100 transition"><i class="fas fa-arrow-right text-xs md:text-base"></i></div></div>`).join('');
+    container.innerHTML = cheats.map(c => `<div data-path="article:articles/cheats/${c.file}" class="card-link p-5 md:p-8 bg-slate-50 dark:bg-slate-900 rounded-[1.25rem] md:rounded-[2rem] border border-slate-100 dark:border-slate-800 flex justify-between items-center cursor-pointer hover:bg-kvant hover:text-white transition group"><span class="font-bold text-sm md:text-base tracking-tight italic">${c.title}</span><div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 flex items-center justify-center opacity-100 md:opacity-0 group-hover:opacity-100 transition"><i class="fas fa-arrow-right text-xs md:text-base"></i></div></div>`).join('');
 }
 
 export function buildLeftSidebar(currentPath) {
@@ -120,7 +117,7 @@ export function buildLeftSidebar(currentPath) {
 
             html += `
             <div class="mb-1">
-                <button onclick="window.toggleSidebarMenu('${listId}', '${iconId}')" class="w-full flex items-center justify-between text-left font-bold text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 py-2 hover:text-kvant transition-colors group">
+                <button data-toggle="${listId}" data-icon="${iconId}" class="sidebar-toggle w-full flex items-center justify-between text-left font-bold text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 py-2 hover:text-kvant transition-colors group">
                     <span>${t.name}</span><i id="${iconId}" class="fas fa-chevron-down text-[10px] transition-transform duration-300 group-hover:text-kvant"></i>
                 </button>
                 <div id="${listId}" class="overflow-hidden transition-all duration-500 max-h-[2000px] opacity-100">
@@ -132,7 +129,7 @@ export function buildLeftSidebar(currentPath) {
                                     ${moduleLessons.map(l => {
                                         const path = `articles/${t.id}/${l.file}`;
                                         const isActive = path === currentPath;
-                                        return `<li><button onclick="window.location.hash='article:${path}'" class="text-left w-full transition-colors ${isActive ? 'text-kvant font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}">${l.title}</button></li>`;
+                                        return `<li><button data-path="article:${path}" class="card-link text-left w-full transition-colors ${isActive ? 'text-kvant font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}">${l.title}</button></li>`;
                                     }).join('')}
                                 </ul>
                             </div>
@@ -146,7 +143,7 @@ export function buildLeftSidebar(currentPath) {
 
     if(window.siteData && window.siteData.cheats) {
         html += `<div class="mt-8">
-            <button onclick="window.toggleSidebarMenu('sidebar-cheats-list', 'sidebar-cheats-icon')" class="w-full flex items-center justify-between text-left font-bold text-slate-800 dark:text-white mb-2 hover:text-amber-500 transition-colors group">
+            <button data-toggle="sidebar-cheats-list" data-icon="sidebar-cheats-icon" class="sidebar-toggle w-full flex items-center justify-between text-left font-bold text-slate-800 dark:text-white mb-2 hover:text-amber-500 transition-colors group">
                 <span class="flex items-center"><div class="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>Шпаргалки</span>
                 <i id="sidebar-cheats-icon" class="fas fa-chevron-down text-[10px] text-slate-400 transition-transform duration-300 group-hover:text-amber-500"></i>
             </button>
@@ -155,14 +152,14 @@ export function buildLeftSidebar(currentPath) {
         window.siteData.cheats.forEach(c => {
             const path = `articles/cheats/${c.file}`;
             const isActive = path === currentPath;
-            html += `<li><button onclick="window.location.hash='article:${path}'" class="text-left w-full transition-colors ${isActive ? 'text-amber-500 font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}">${c.title}</button></li>`;
+            html += `<li><button data-path="article:${path}" class="card-link text-left w-full transition-colors ${isActive ? 'text-amber-500 font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}">${c.title}</button></li>`;
         });
         html += `</ul></div></div>`;
     }
     container.innerHTML = html;
 }
 
-window.toggleSidebarMenu = function(listId, iconId) {
+export function toggleSidebarMenu(listId, iconId) {
     const list = document.getElementById(listId);
     const icon = document.getElementById(iconId);
     if (!list || !icon) return;
@@ -171,7 +168,7 @@ window.toggleSidebarMenu = function(listId, iconId) {
     } else {
         list.classList.add('max-h-0', 'opacity-0'); list.classList.remove('max-h-[2000px]', 'opacity-100'); icon.classList.add('-rotate-90');
     }
-};
+}
 
 export function buildToC() {
     const container = document.getElementById('right-sidebar-content');

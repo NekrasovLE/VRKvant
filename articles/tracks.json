@@ -15,20 +15,6 @@
       ]
     },
     {
-      "id": "unreal",
-      "name": "Unreal Engine",
-      "icon": "https://cdn.simpleicons.org/unrealengine/f59e0b",
-      "colorClass": "bg-blue-700",
-      "lessons": [
-        {
-          "title": "Введение в Unreal Engine",
-          "file": "intro.md",
-          "module": "Основы",
-          "order": 1
-        }
-      ]
-    },
-    {
       "id": "unity",
       "name": "Unity",
       "icon": "fab fa-unity",
@@ -36,6 +22,20 @@
       "lessons": [
         {
           "title": "Введение в Unity",
+          "file": "intro.md",
+          "module": "Основы",
+          "order": 1
+        }
+      ]
+    },
+    {
+      "id": "unreal",
+      "name": "Unreal Engine",
+      "icon": "https://cdn.simpleicons.org/unrealengine/f59e0b",
+      "colorClass": "bg-blue-700",
+      "lessons": [
+        {
+          "title": "Введение в Unreal Engine",
           "file": "intro.md",
           "module": "Основы",
           "order": 1

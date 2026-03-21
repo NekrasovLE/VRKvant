@@ -1,45 +1,129 @@
 import { initRouter, updateEditorPreview, insertTemplate, copyEditorCode, downloadMarkdown, goBackSafe } from './router.js';
 import { initSearch, openSearch, closeSearch } from './search.js';
 import { initGithubAuth, publishToGitHub, uploadImage } from './github.js';
+import { toggleTheme, toggleMobileMenu, scrollPortfolio } from './ui.js';
 
-function togglePublishPanel() {
-    const panel = document.getElementById('publish-panel');
-    if (panel) {
-        panel.classList.toggle('hidden');
-        panel.classList.toggle('flex');
-        if (!panel.classList.contains('hidden')) {
-            updateMetaFields(); // Обновляем поля при открытии
+/**
+ * Инициализация всех слушателей событий (Stage 5: Eliminate Scope Pollution)
+ */
+function initEvents() {
+    // Навигация
+    document.getElementById('nav-logo')?.addEventListener('click', () => window.location.hash = 'home');
+    document.getElementById('nav-home')?.addEventListener('click', () => window.location.hash = 'home');
+    document.getElementById('nav-tracks')?.addEventListener('click', () => window.location.hash = 'tracks');
+    document.getElementById('nav-cheats')?.addEventListener('click', () => window.location.hash = 'cheats');
+    document.getElementById('nav-projects')?.addEventListener('click', () => window.location.hash = 'projects');
+    
+    // Тема и Мобильное меню
+    document.getElementById('btn-toggle-theme')?.addEventListener('click', toggleTheme);
+    document.getElementById('btn-toggle-theme-mobile')?.addEventListener('click', toggleTheme);
+    document.getElementById('btn-toggle-mobile-menu')?.addEventListener('click', toggleMobileMenu);
+    document.getElementById('btn-close-mobile-menu')?.addEventListener('click', toggleMobileMenu);
+    
+    // Мобильная навигация
+    document.getElementById('mobile-nav-home')?.addEventListener('click', () => { window.location.hash = 'home'; toggleMobileMenu(); });
+    document.getElementById('mobile-nav-tracks')?.addEventListener('click', () => { window.location.hash = 'tracks'; toggleMobileMenu(); });
+    document.getElementById('mobile-nav-cheats')?.addEventListener('click', () => { window.location.hash = 'cheats'; toggleMobileMenu(); });
+    document.getElementById('mobile-nav-projects')?.addEventListener('click', () => { window.location.hash = 'projects'; toggleMobileMenu(); });
+
+    // Поиск
+    document.getElementById('btn-open-search')?.addEventListener('click', openSearch);
+    document.getElementById('btn-open-search-mobile')?.addEventListener('click', openSearch);
+    document.getElementById('btn-close-search')?.addEventListener('click', closeSearch);
+
+    // Главная страница
+    document.getElementById('btn-show-all-tracks')?.addEventListener('click', () => window.location.hash = 'tracks');
+    document.getElementById('btn-show-all-projects')?.addEventListener('click', () => window.location.hash = 'projects');
+    document.getElementById('btn-portfolio-prev')?.addEventListener('click', () => scrollPortfolio(-400));
+    document.getElementById('btn-portfolio-next')?.addEventListener('click', () => scrollPortfolio(400));
+
+    // Просмотр статьи
+    document.getElementById('btn-back-from-article')?.addEventListener('click', goBackSafe);
+
+    // Делегирование для карточек и ссылок (динамический контент)
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.card-link');
+        if (card) {
+            const path = card.getAttribute('data-path');
+            if (path) window.location.hash = path;
         }
-    }
+
+        const sidebarToggle = e.target.closest('.sidebar-toggle');
+        if (sidebarToggle) {
+            const listId = sidebarToggle.getAttribute('data-toggle');
+            const iconId = sidebarToggle.getAttribute('data-icon');
+            import('./ui.js').then(m => m.toggleSidebarMenu(listId, iconId));
+        }
+    });
+
+    // РЕДАКТОР
+    document.getElementById('btn-editor-back')?.addEventListener('click', goBackSafe);
+    document.getElementById('btn-editor-home-mobile')?.addEventListener('click', () => window.location.hash = 'home');
+    document.getElementById('btn-editor-copy')?.addEventListener('click', copyEditorCode);
+    document.getElementById('publish-btn')?.addEventListener('click', publishToGitHub);
+    
+    document.getElementById('btn-preview-article')?.addEventListener('click', () => switchPreviewMode('article'));
+    document.getElementById('btn-preview-card')?.addEventListener('click', () => switchPreviewMode('card'));
+
+    // Метаданные редактора
+    document.getElementById('meta-type')?.addEventListener('change', () => {
+        updateMetaFields();
+        updateCardPreview();
+    });
+    document.getElementById('meta-title')?.addEventListener('input', () => {
+        autoTransliterate();
+        updateCardPreview();
+    });
+    document.getElementById('meta-desc')?.addEventListener('input', updateCardPreview);
+    document.getElementById('meta-authors')?.addEventListener('input', updateCardPreview);
+    document.getElementById('meta-tags')?.addEventListener('input', updateCardPreview);
+    document.getElementById('meta-image')?.addEventListener('input', updateCardPreview);
+    document.getElementById('meta-icon')?.addEventListener('input', updateCardPreview);
+    document.getElementById('meta-color')?.addEventListener('change', updateCardPreview);
+
+    // Тулбар редактора
+    document.getElementById('toolbar-h2')?.addEventListener('click', () => insertTemplate('h2'));
+    document.getElementById('toolbar-h3')?.addEventListener('click', () => insertTemplate('h3'));
+    document.getElementById('toolbar-bold')?.addEventListener('click', () => insertTemplate('bold'));
+    document.getElementById('toolbar-code')?.addEventListener('click', () => insertTemplate('code'));
+    document.getElementById('toolbar-warn')?.addEventListener('click', () => insertTemplate('quote-warn'));
+    document.getElementById('toolbar-tip')?.addEventListener('click', () => insertTemplate('quote-tip'));
+    document.getElementById('toolbar-compare')?.addEventListener('click', () => insertTemplate('compare'));
+    document.getElementById('toolbar-gallery')?.addEventListener('click', () => insertTemplate('gallery'));
+    document.getElementById('upload-img-btn')?.addEventListener('click', () => document.getElementById('image-upload-input').click());
+    document.getElementById('image-upload-input')?.addEventListener('change', uploadImage);
 }
 
 function updateMetaFields() {
-    const type = document.getElementById('meta-type').value;
+    const type = document.getElementById('meta-type')?.value;
+    if (!type) return;
     
-    // Скрываем все группы по умолчанию
     document.querySelectorAll('.meta-group').forEach(el => el.classList.add('hidden'));
     
+    const labelTitle = document.getElementById('label-title');
+
     if (type === 'lesson') {
-        document.getElementById('field-track').classList.remove('hidden');
-        document.getElementById('field-module').classList.remove('hidden');
-        document.getElementById('field-order').classList.remove('hidden');
-        document.getElementById('label-title').innerText = "Название Урока";
+        document.getElementById('field-track')?.classList.remove('hidden');
+        document.getElementById('field-module')?.classList.remove('hidden');
+        document.getElementById('field-order')?.classList.remove('hidden');
+        if (labelTitle) labelTitle.innerText = "Название Урока";
     } else if (type === 'cheat') {
-        document.getElementById('field-order').classList.remove('hidden');
-        document.getElementById('label-title').innerText = "Название Шпаргалки";
+        document.getElementById('field-order')?.classList.remove('hidden');
+        if (labelTitle) labelTitle.innerText = "Название Шпаргалки";
     } else if (type === 'project') {
-        document.getElementById('field-project-desc').classList.remove('hidden');
-        document.getElementById('field-project-authors').classList.remove('hidden');
-        document.getElementById('field-project-tags').classList.remove('hidden');
-        document.getElementById('label-title').innerText = "Название Проекта";
+        document.getElementById('field-project-desc')?.classList.remove('hidden');
+        document.getElementById('field-project-authors')?.classList.remove('hidden');
+        document.getElementById('field-project-tags')?.classList.remove('hidden');
+        document.getElementById('field-project-image')?.classList.remove('hidden');
+        if (labelTitle) labelTitle.innerText = "Название Проекта";
     } else if (type === 'intro') {
-        document.getElementById('field-track-id').classList.remove('hidden');
-        document.getElementById('field-track-icon').classList.remove('hidden');
-        document.getElementById('field-track-color').classList.remove('hidden');
-        document.getElementById('label-title').innerText = "Отображаемое Имя Трека";
+        document.getElementById('field-track-id')?.classList.remove('hidden');
+        document.getElementById('field-track-icon')?.classList.remove('hidden');
+        document.getElementById('field-track-color')?.classList.remove('hidden');
+        if (labelTitle) labelTitle.innerText = "Имя Трека";
     }
     
-    autoTransliterate(); // Обновляем авто-поля при смене типа
+    autoTransliterate();
 }
 
 const cyrillicToLatinMap = {
@@ -51,8 +135,12 @@ const cyrillicToLatinMap = {
 };
 
 function autoTransliterate() {
-    const title = document.getElementById('meta-title').value.toLowerCase();
-    const type = document.getElementById('meta-type').value;
+    const titleInput = document.getElementById('meta-title');
+    const typeInput = document.getElementById('meta-type');
+    if (!titleInput || !typeInput) return;
+
+    const title = titleInput.value.toLowerCase();
+    const type = typeInput.value;
     
     let result = '';
     for (let i = 0; i < title.length; i++) {
@@ -66,16 +154,17 @@ function autoTransliterate() {
         }
     }
     
-    // Убираем двойные подчеркивания
     result = result.replace(/_+/g, '_').replace(/^_|_$/g, '');
-    
     if (!result) result = 'new_article';
 
+    const trackIdInput = document.getElementById('meta-track-id');
+    const filenameInput = document.getElementById('meta-filename');
+
     if (type === 'intro') {
-        document.getElementById('meta-track-id').value = result;
-        document.getElementById('meta-filename').value = 'intro';
+        if (trackIdInput) trackIdInput.value = result;
+        if (filenameInput) filenameInput.value = 'intro';
     } else {
-        document.getElementById('meta-filename').value = result;
+        if (filenameInput) filenameInput.value = result;
     }
 }
 
@@ -85,30 +174,24 @@ function switchPreviewMode(mode) {
     const previewArticle = document.getElementById('editor-preview');
     const previewCard = document.getElementById('card-preview');
     
+    if (!btnArticle || !btnCard || !previewArticle || !previewCard) return;
+
     if (mode === 'article') {
-        btnArticle.classList.replace('text-slate-500', 'text-kvant');
-        btnArticle.classList.replace('hover:text-slate-800', 'bg-white');
-        btnArticle.classList.replace('dark:hover:text-white', 'dark:bg-slate-700');
-        btnArticle.classList.add('shadow-sm');
+        btnArticle.classList.add('bg-white', 'dark:bg-slate-700', 'text-kvant', 'shadow-sm');
+        btnArticle.classList.remove('text-slate-500');
         
-        btnCard.classList.replace('text-kvant', 'text-slate-500');
-        btnCard.classList.replace('bg-white', 'hover:text-slate-800');
-        btnCard.classList.replace('dark:bg-slate-700', 'dark:hover:text-white');
-        btnCard.classList.remove('shadow-sm');
+        btnCard.classList.remove('bg-white', 'dark:bg-slate-700', 'text-kvant', 'shadow-sm');
+        btnCard.classList.add('text-slate-500');
         
         previewArticle.classList.remove('hidden');
         previewCard.classList.add('hidden');
         previewCard.classList.remove('flex');
     } else {
-        btnCard.classList.replace('text-slate-500', 'text-kvant');
-        btnCard.classList.replace('hover:text-slate-800', 'bg-white');
-        btnCard.classList.replace('dark:hover:text-white', 'dark:bg-slate-700');
-        btnCard.classList.add('shadow-sm');
+        btnCard.classList.add('bg-white', 'dark:bg-slate-700', 'text-kvant', 'shadow-sm');
+        btnCard.classList.remove('text-slate-500');
         
-        btnArticle.classList.replace('text-kvant', 'text-slate-500');
-        btnArticle.classList.replace('bg-white', 'hover:text-slate-800');
-        btnArticle.classList.replace('dark:bg-slate-700', 'dark:hover:text-white');
-        btnArticle.classList.remove('shadow-sm');
+        btnArticle.classList.remove('bg-white', 'dark:bg-slate-700', 'text-kvant', 'shadow-sm');
+        btnArticle.classList.add('text-slate-500');
         
         previewArticle.classList.add('hidden');
         previewCard.classList.remove('hidden');
@@ -118,41 +201,41 @@ function switchPreviewMode(mode) {
 }
 
 function updateCardPreview() {
-    const type = document.getElementById('meta-type').value;
+    const type = document.getElementById('meta-type')?.value;
     const container = document.getElementById('card-preview-container');
-    const title = document.getElementById('meta-title').value || 'Название';
+    const title = document.getElementById('meta-title')?.value || 'Название';
     
     if (!container) return;
 
     if (type === 'project') {
-        const desc = document.getElementById('meta-desc').value || 'Краткое описание проекта...';
-        const authors = document.getElementById('meta-authors').value || 'Иванов И.';
-        const tags = document.getElementById('meta-tags').value.split(',').map(t => t.trim()).filter(t => t);
-        const image = document.getElementById('meta-image').value;
+        const desc = document.getElementById('meta-desc')?.value || 'Краткое описание проекта...';
+        const authors = document.getElementById('meta-authors')?.value || 'Иванов И.';
+        const tags = document.getElementById('meta-tags')?.value.split(',').map(t => t.trim()).filter(t => t) || [];
+        const image = document.getElementById('meta-image')?.value;
         
-        const tagsHtml = tags.length ? `<div class="absolute top-4 md:top-6 left-4 md:left-6 flex gap-2 flex-wrap">${tags.map(t => `<span class="bg-black/40 backdrop-blur-md text-white text-[8px] md:text-[9px] uppercase font-black px-3 py-1.5 rounded-full border border-white/20">${t}</span>`).join('')}</div>` : '';
+        const tagsHtml = tags.length ? `<div class="absolute top-4 left-4 flex gap-2 flex-wrap">${tags.map(t => `<span class="bg-black/40 backdrop-blur-md text-white text-[8px] uppercase font-black px-3 py-1.5 rounded-full border border-white/20">${t}</span>`).join('')}</div>` : '';
         const imageHtml = image ? `<img src="${image}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-4xl opacity-20"><i class="fas fa-image"></i></div>`;
 
         container.innerHTML = `
-            <div class="w-full bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 dark:border-slate-800 group pointer-events-none">
-                <div class="h-48 md:h-60 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">${imageHtml}${tagsHtml}</div>
-                <div class="p-6 md:p-8">
-                    <h3 class="heading-font text-xl mb-2 md:mb-4 text-slate-800 dark:text-white">${title}</h3>
-                    <p class="text-slate-500 text-xs md:text-sm mb-4 md:mb-6 line-clamp-2">${desc}</p>
-                    <div class="flex items-center text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <div class="w-full bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-100 dark:border-slate-800 pointer-events-none">
+                <div class="h-48 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">${imageHtml}${tagsHtml}</div>
+                <div class="p-6">
+                    <h3 class="heading-font text-xl mb-2 text-slate-800 dark:text-white">${title}</h3>
+                    <p class="text-slate-500 text-xs mb-4 line-clamp-2">${desc}</p>
+                    <div class="flex items-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                         <i class="fas fa-user-circle mr-2 text-kvant"></i> ${authors}
                     </div>
                 </div>
             </div>
         `;
     } else if (type === 'intro') {
-        const iconRaw = document.getElementById('meta-icon').value || 'fas fa-gamepad';
-        const color = document.getElementById('meta-color').value || 'bg-kvant';
+        const iconRaw = document.getElementById('meta-icon')?.value || 'fas fa-gamepad';
+        const color = document.getElementById('meta-color')?.value || 'bg-kvant';
         const isUrl = iconRaw.includes('/');
         const iconHtml = isUrl ? `<img src="${iconRaw}" class="w-12 h-12 object-contain">` : `<i class="${iconRaw} text-[3rem]"></i>`;
 
         container.innerHTML = `
-            <div class="p-10 bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] border-2 border-transparent border-kvant transition-all shadow-xl flex flex-col items-center pointer-events-none">
+            <div class="p-10 bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] border-2 border-kvant transition-all shadow-xl flex flex-col items-center pointer-events-none w-full">
                 <div class="w-16 h-16 mb-6 ${color} rounded-2xl flex items-center justify-center text-white shadow-lg">
                     ${iconHtml}
                 </div>
@@ -170,25 +253,11 @@ function updateCardPreview() {
     }
 }
 
-// ЭКСПОРТИРУЕМ ФУНКЦИИ СРАЗУ (до инициализации), чтобы они были доступны в HTML
-window.goBackSafe = goBackSafe;
-window.openSearch = openSearch;
-window.closeSearch = closeSearch;
-window.updateEditorPreview = updateEditorPreview;
-window.insertTemplate = insertTemplate;
-window.copyEditorCode = copyEditorCode;
-window.downloadMarkdown = downloadMarkdown;
-window.updateMetaFields = updateMetaFields;
-window.autoTransliterate = autoTransliterate;
-window.publishToGitHub = publishToGitHub;
-window.uploadImage = uploadImage;
-window.switchPreviewMode = switchPreviewMode;
-window.updateCardPreview = updateCardPreview;
-
 // Инициализация роутера и других глобальных слушателей
 initRouter();
 initSearch();
 initGithubAuth();
+initEvents();
 
 // Слушатель секретного сочетания клавиш (Ctrl + Shift + E)
 window.addEventListener("keydown", function(e) {
@@ -203,21 +272,13 @@ const mdPreview = document.getElementById("editor-preview");
 const mdPlaceholder = document.getElementById("editor-placeholder");
 
 if(mdInput && mdPreview) {
-    mdInput.addEventListener("input", () => updateEditorPreview(mdInput, mdPreview, mdPlaceholder));
+    mdInput.addEventListener("input", () => {
+        updateEditorPreview(mdInput, mdPreview, mdPlaceholder);
+    });
     
     // Синхронизация скролла
     mdInput.addEventListener("scroll", () => {
         const percentage = mdInput.scrollTop / (mdInput.scrollHeight - mdInput.clientHeight);
         mdPreview.scrollTop = percentage * (mdPreview.scrollHeight - mdPreview.clientHeight);
     });
-
-    // Передаем эти элементы в функции для редактора
-    window.insertTemplate = (type) => insertTemplate(mdInput, type);
-    window.copyEditorCode = (event) => copyEditorCode(mdInput, event);
-    window.downloadMarkdown = () => downloadMarkdown(mdInput);
-
-    // Если мы на странице редактора, сразу обновляем превью
-    if (window.location.hash === '#editor') {
-        updateEditorPreview(mdInput, mdPreview, mdPlaceholder);
-    }
 }

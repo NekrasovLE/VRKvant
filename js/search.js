@@ -16,10 +16,31 @@ export function initSearch() {
             if (e.target === searchModal) closeSearch();
         });
     }
+
+    // Обработка клика по кнопкам открытия/закрытия
+    const btnOpen = document.getElementById('btn-open-search');
+    const btnOpenMobile = document.getElementById('btn-open-search-mobile');
+    const btnClose = document.getElementById('btn-close-search');
+
+    if (btnOpen) btnOpen.addEventListener('click', openSearch);
+    if (btnOpenMobile) btnOpenMobile.addEventListener('click', openSearch);
+    if (btnClose) btnClose.addEventListener('click', closeSearch);
+
+    // Делегирование кликов по результатам
+    const resultsContainer = document.getElementById('search-results');
+    if (resultsContainer) {
+        resultsContainer.addEventListener('click', (e) => {
+            const resultItem = e.target.closest('.search-result-item');
+            if (resultItem) {
+                const path = resultItem.getAttribute('data-path');
+                window.location.hash = path;
+                closeSearch();
+            }
+        });
+    }
 }
 
 export function openSearch() {
-    console.log("Вызов openSearch()");
     const modal = document.getElementById('search-modal');
     const input = document.getElementById('search-input');
     if (modal) {
@@ -28,10 +49,8 @@ export function openSearch() {
             input.value = '';
             input.focus();
         }
-        document.body.style.overflow = 'hidden'; // Блокируем скролл страницы
-        renderResults([]); // Очищаем старые результаты
-    } else {
-        console.error("Элемент #search-modal не найден!");
+        document.body.style.overflow = 'hidden'; 
+        renderResults([]); 
     }
 }
 
@@ -44,7 +63,6 @@ export function closeSearch() {
 }
 
 function performSearch(query) {
-    const resultsContainer = document.getElementById('search-results');
     if (!query.trim()) {
         renderResults([]);
         return;
@@ -53,7 +71,6 @@ function performSearch(query) {
     const q = query.toLowerCase();
     const results = [];
 
-    // Поиск по трекам и урокам
     if (window.siteData.tracks) {
         window.siteData.tracks.forEach(track => {
             track.lessons.forEach(lesson => {
@@ -70,7 +87,6 @@ function performSearch(query) {
         });
     }
 
-    // Поиск по шпаргалкам
     if (window.siteData.cheats) {
         window.siteData.cheats.forEach(cheat => {
             if (cheat.title.toLowerCase().includes(q)) {
@@ -85,10 +101,9 @@ function performSearch(query) {
         });
     }
 
-    // Поиск по портфолио
     if (window.siteData.portfolio) {
         window.siteData.portfolio.forEach(project => {
-            if (project.title.toLowerCase().includes(q) || project.description.toLowerCase().includes(q)) {
+            if (project.title.toLowerCase().includes(q) || (project.description && project.description.toLowerCase().includes(q))) {
                 results.push({
                     title: project.title,
                     type: 'Проект',
@@ -115,7 +130,7 @@ function renderResults(results) {
     }
 
     container.innerHTML = results.map(r => `
-        <div onclick="window.location.hash='${r.path}'; closeSearch();" class="p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-kvant hover:text-white rounded-2xl cursor-pointer transition group flex items-center justify-between">
+        <div data-path="${r.path}" class="search-result-item p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-kvant hover:text-white rounded-2xl cursor-pointer transition group flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-kvant group-hover:bg-white/20 group-hover:text-white transition">
                     <i class="${r.icon}"></i>

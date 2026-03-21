@@ -41,36 +41,39 @@
     <!-- НАВИГАЦИЯ -->
     <nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-900">
         <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.hash='home'">
+            <div class="flex items-center space-x-3 cursor-pointer" id="nav-logo">
                 <div class="bg-kvant p-2 rounded-xl text-white shadow-lg shadow-kvant/30"><i class="fas fa-vr-cardboard text-lg md:text-xl"></i></div>
                 <span class="heading-font font-bold text-base md:text-lg tracking-tighter uppercase">VR/AR <span class="text-kvant">Квантум</span></span>
             </div>
             
             <div class="hidden md:flex items-center space-x-8 font-bold text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                <button onclick="window.location.hash='home'" class="nav-item active hover:text-kvant transition" id="nav-home">Главная</button>
-                <button onclick="window.location.hash='tracks'" class="nav-item hover:text-kvant transition" id="nav-tracks">Треки</button>
-                <button onclick="window.location.hash='cheats'" class="nav-item hover:text-kvant transition" id="nav-cheats">Шпаргалки</button>
-                <button onclick="window.location.hash='projects'" class="nav-item hover:text-kvant transition" id="nav-projects">Проекты</button>
-                <button onclick="openSearch()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 transition-transform hover:scale-110"><i class="fas fa-search"></i></button>
-                <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-amber-400 transition-transform hover:scale-110"><i id="theme-icon" class="fas fa-moon"></i></button>
+                <button class="nav-item active hover:text-kvant transition" id="nav-home">Главная</button>
+                <button class="nav-item hover:text-kvant transition" id="nav-tracks">Треки</button>
+                <button class="nav-item hover:text-kvant transition" id="nav-cheats">Шпаргалки</button>
+                <button class="nav-item hover:text-kvant transition" id="nav-projects">Проекты</button>
+                <button id="btn-open-search" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 transition-transform hover:scale-110"><i class="fas fa-search"></i></button>
+                <button id="btn-toggle-theme" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-amber-400 transition-transform hover:scale-110"><i id="theme-icon" class="fas fa-moon"></i></button>
             </div>
             
             <div class="md:hidden flex items-center gap-4">
-                <button onclick="openSearch()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300"><i class="fas fa-search"></i></button>
-                <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-amber-400"><i id="theme-icon-mobile" class="fas fa-moon"></i></button>
-                <button onclick="toggleMobileMenu()" class="text-slate-600 dark:text-slate-300 text-2xl"><i class="fas fa-bars"></i></button>
+                <button id="btn-open-search-mobile" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300"><i class="fas fa-search"></i></button>
+                <button id="btn-toggle-theme-mobile" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-amber-400"><i id="theme-icon-mobile" class="fas fa-moon"></i></button>
+                <button id="btn-toggle-mobile-menu" class="text-slate-600 dark:text-slate-300 text-2xl"><i class="fas fa-bars"></i></button>
             </div>
         </div>
     </nav>
 
     <!-- МОБИЛЬНОЕ МЕНЮ -->
     <div id="mobile-menu" class="fixed inset-0 z-[60] bg-white dark:bg-slate-950 hidden-menu md:hidden flex flex-col p-6">
-        <div class="flex justify-between items-center mb-10"><span class="heading-font font-bold text-lg uppercase">Меню</span><button onclick="toggleMobileMenu()" class="text-3xl">&times;</button></div>
+        <div class="flex justify-between items-center mb-10">
+            <span class="heading-font font-bold text-lg uppercase">Меню</span>
+            <button id="btn-close-mobile-menu" class="text-3xl">&times;</button>
+        </div>
         <nav class="flex flex-col space-y-6 text-xl font-bold">
-            <button onclick="window.location.hash='home'; toggleMobileMenu();" class="text-left py-2 border-b dark:border-slate-800">Главная</button>
-            <button onclick="window.location.hash='tracks'; toggleMobileMenu();" class="text-left py-2 border-b dark:border-slate-800">Треки</button>
-            <button onclick="window.location.hash='cheats'; toggleMobileMenu();" class="text-left py-2 border-b dark:border-slate-800">Шпаргалки</button>
-            <button onclick="window.location.hash='projects'; toggleMobileMenu();" class="text-left py-2 border-b dark:border-slate-800">Проекты</button>
+            <button id="mobile-nav-home" class="text-left py-2 border-b dark:border-slate-800">Главная</button>
+            <button id="mobile-nav-tracks" class="text-left py-2 border-b dark:border-slate-800">Треки</button>
+            <button id="mobile-nav-cheats" class="text-left py-2 border-b dark:border-slate-800">Шпаргалки</button>
+            <button id="mobile-nav-projects" class="text-left py-2 border-b dark:border-slate-800">Проекты</button>
         </nav>
     </div>
 
@@ -88,19 +91,18 @@
                 <p class="text-xs md:text-base text-slate-500 mt-2 md:mt-3">Выбери направление для изучения</p>
             </div>
             
-            <!-- Сетка. pt-4 спасает от обрезания тени и анимации подпрыгивания -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-4">
-                <div onclick="window.location.hash='article:articles/blender/intro.md'" class="p-6 md:p-10 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] border-2 border-transparent hover:border-kvant cursor-pointer transition-all hover:-translate-y-3 hover:shadow-xl flex flex-col items-center group">
+                <div data-path="article:articles/blender/intro.md" class="card-link p-6 md:p-10 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] border-2 border-transparent hover:border-kvant cursor-pointer transition-all hover:-translate-y-3 hover:shadow-xl flex flex-col items-center group">
                     <img src="https://cdn.simpleicons.org/blender/f97316" alt="Blender Logo" class="w-10 h-10 md:w-12 md:h-12 mb-4 md:mb-6 group-hover:scale-110 transition-transform">
                     <h3 class="heading-font text-lg md:text-xl mb-2 w-full text-center">Blender</h3>
                     <p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-black tracking-widest text-center w-full">3D Modeling</p>
                 </div>
-                <div onclick="window.location.hash='article:articles/unity/intro.md'" class="p-6 md:p-10 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] border-2 border-transparent hover:border-kvant cursor-pointer transition-all hover:-translate-y-3 hover:shadow-xl flex flex-col items-center group">
+                <div data-path="article:articles/unity/intro.md" class="card-link p-6 md:p-10 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] border-2 border-transparent hover:border-kvant cursor-pointer transition-all hover:-translate-y-3 hover:shadow-xl flex flex-col items-center group">
                     <i class="fab fa-unity text-4xl md:text-[3rem] mb-4 md:mb-6 text-indigo-500 leading-none h-10 md:h-12 flex items-center group-hover:scale-110 transition-transform"></i>
                     <h3 class="heading-font text-lg md:text-xl mb-2 w-full text-center">Unity</h3>
                     <p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-black tracking-widest text-center w-full">VR Development</p>
                 </div>
-                <div onclick="window.location.hash='article:articles/unreal/intro.md'" class="p-6 md:p-10 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] border-2 border-transparent hover:border-kvant cursor-pointer transition-all hover:-translate-y-3 hover:shadow-xl flex flex-col items-center group">
+                <div data-path="article:articles/unreal/intro.md" class="card-link p-6 md:p-10 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] border-2 border-transparent hover:border-kvant cursor-pointer transition-all hover:-translate-y-3 hover:shadow-xl flex flex-col items-center group">
                     <img src="https://cdn.simpleicons.org/unrealengine/f59e0b" alt="Unreal Logo" class="w-10 h-10 md:w-12 md:h-12 mb-4 md:mb-6 group-hover:scale-110 transition-transform">
                     <h3 class="heading-font text-lg md:text-xl mb-2 w-full text-center">Unreal</h3>
                     <p class="text-[9px] md:text-[10px] text-slate-400 uppercase font-black tracking-widest text-center w-full">Visual Coding</p>
@@ -108,7 +110,7 @@
             </div>
             
             <div class="text-center mt-8">
-                <button onclick="window.location.hash='tracks'" class="text-kvant text-xs md:text-sm font-bold uppercase tracking-widest hover:opacity-70 transition group">Показать все треки <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition"></i></button>
+                <button id="btn-show-all-tracks" class="text-kvant text-xs md:text-sm font-bold uppercase tracking-widest hover:opacity-70 transition group">Показать все треки <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition"></i></button>
             </div>
         </div>
         
@@ -118,8 +120,8 @@
                 <div class="flex justify-between items-end mb-8 md:mb-12">
                     <div><h2 class="heading-font text-2xl md:text-5xl uppercase tracking-tighter">Наши <span class="text-kvant">проекты</span></h2><p class="text-xs md:text-base text-slate-500 mt-2 md:mt-4">Результаты работы команд в текущем учебном году</p></div>
                     <div class="hidden md:flex space-x-3">
-                        <button onclick="document.getElementById('portfolio-carousel').scrollBy({left: -400, behavior: 'smooth'})" class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-md flex items-center justify-center hover:text-kvant transition"><i class="fas fa-chevron-left"></i></button>
-                        <button onclick="document.getElementById('portfolio-carousel').scrollBy({left: 400, behavior: 'smooth'})" class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-md flex items-center justify-center hover:text-kvant transition"><i class="fas fa-chevron-right"></i></button>
+                        <button id="btn-portfolio-prev" class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-md flex items-center justify-center hover:text-kvant transition"><i class="fas fa-chevron-left"></i></button>
+                        <button id="btn-portfolio-next" class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-md flex items-center justify-center hover:text-kvant transition"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
                 
@@ -129,7 +131,7 @@
                 </div>
                 
                 <div class="text-center mt-6">
-                    <button onclick="window.location.hash='projects'" class="text-kvant text-xs md:text-sm font-bold uppercase tracking-widest hover:opacity-70 transition group">Показать все проекты <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition"></i></button>
+                    <button id="btn-show-all-projects" class="text-kvant text-xs md:text-sm font-bold uppercase tracking-widest hover:opacity-70 transition group">Показать все проекты <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition"></i></button>
                 </div>
             </div>
         </div>
@@ -169,7 +171,7 @@
             </aside>
 
             <div class="flex-1 min-w-0 max-w-4xl mx-auto w-full">
-                <button onclick="goBackSafe()" class="mb-6 md:mb-10 group flex items-center text-kvant font-bold uppercase text-[10px] md:text-xs tracking-[0.2em] hover:opacity-70 transition">
+                <button id="btn-back-from-article" class="mb-6 md:mb-10 group flex items-center text-kvant font-bold uppercase text-[10px] md:text-xs tracking-[0.2em] hover:opacity-70 transition">
                     <i class="fas fa-long-arrow-alt-left mr-3 group-hover:-translate-x-2 transition"></i> Вернуться назад
                 </button>
                 <article id="article-content" class="prose max-w-none bg-white dark:bg-slate-900 px-5 py-8 md:p-12 lg:p-16 rounded-[1.5rem] md:rounded-[3rem] shadow-xl md:shadow-2xl border border-slate-100 dark:border-slate-800 overflow-x-hidden relative"></article>
@@ -191,23 +193,23 @@
             <i class="fas fa-desktop text-6xl text-slate-300 dark:text-slate-700 mb-6"></i>
             <h2 class="heading-font text-xl text-slate-600 dark:text-slate-400 mb-2">Редактор только для ПК</h2>
             <p class="text-sm text-slate-500 max-w-xs">Для комфортной работы с кодом и предпросмотром откройте эту страницу на компьютере.</p>
-            <button onclick="window.location.hash='home'" class="mt-8 text-kvant font-bold uppercase text-xs tracking-widest"><i class="fas fa-arrow-left mr-2"></i>На главную</button>
+            <button id="btn-editor-home-mobile" class="mt-8 text-kvant font-bold uppercase text-xs tracking-widest"><i class="fas fa-arrow-left mr-2"></i>На главную</button>
         </div>
 
         <!-- Рабочая зона для ПК -->
         <div class="hidden md:flex max-w-[100rem] mx-auto w-full flex-1 flex-col h-[calc(100vh-8rem)] min-h-[700px]">
             <div class="flex justify-between items-center mb-4 px-2">
                 <div class="flex items-center gap-4">
-                    <button onclick="goBackSafe()" class="group flex items-center text-slate-400 hover:text-kvant transition"><i class="fas fa-arrow-left text-xl group-hover:-translate-x-1 transition"></i></button>
+                    <button id="btn-editor-back" class="group flex items-center text-slate-400 hover:text-kvant transition"><i class="fas fa-arrow-left text-xl group-hover:-translate-x-1 transition"></i></button>
                     <h2 class="heading-font text-2xl uppercase tracking-tighter">Песочница <span class="text-kvant">Автора</span></h2>
                 </div>
                 <div class="flex gap-3 items-center">
                    <div class="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mr-4">
-                       <button onclick="switchPreviewMode('article')" id="btn-preview-article" class="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wider bg-white dark:bg-slate-700 text-kvant shadow-sm transition">Статья</button>
-                       <button onclick="switchPreviewMode('card')" id="btn-preview-card" class="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800 dark:hover:text-white transition">Карточка</button>
+                       <button id="btn-preview-article" class="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wider bg-white dark:bg-slate-700 text-kvant shadow-sm transition">Статья</button>
+                       <button id="btn-preview-card" class="px-4 py-1.5 rounded text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800 dark:hover:text-white transition">Карточка</button>
                    </div>
-                   <button onclick="copyEditorCode()" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-kvant hover:text-white transition shadow-sm"><i class="fas fa-copy mr-2"></i>MD</button>
-                   <button onclick="publishToGitHub()" id="publish-btn" class="bg-kvant text-white px-6 py-2 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-500 transition shadow-lg shadow-kvant/30"><i class="fab fa-github mr-2"></i>Опубликовать</button>
+                   <button id="btn-editor-copy" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-kvant hover:text-white transition shadow-sm"><i class="fas fa-copy mr-2"></i>MD</button>
+                   <button id="publish-btn" class="bg-kvant text-white px-6 py-2 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-500 transition shadow-lg shadow-kvant/30"><i class="fab fa-github mr-2"></i>Опубликовать</button>
                 </div>
             </div>
             
@@ -226,7 +228,7 @@
                         <div class="w-full h-px bg-slate-200 dark:bg-slate-800 my-1"></div>
                         <div>
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Тип контента</label>
-                            <select id="meta-type" onchange="window.updateMetaFields(); window.updateCardPreview();" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none font-bold text-kvant">
+                            <select id="meta-type" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none font-bold text-kvant">
                                 <option value="lesson">📘 Урок</option>
                                 <option value="cheat">⚡ Шпаргалка</option>
                                 <option value="project">🏆 Проект</option>
@@ -235,7 +237,7 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1" id="label-title">Название</label>
-                            <input type="text" id="meta-title" placeholder="Введите название..." oninput="window.autoTransliterate(); window.updateCardPreview();" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none font-bold">
+                            <input type="text" id="meta-title" placeholder="Введите название..." class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none font-bold">
                         </div>
                         
                         <!-- Поля для Урока -->
@@ -259,19 +261,19 @@
                         <!-- Поля для Проекта -->
                         <div id="field-project-desc" class="meta-group hidden">
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Краткое описание</label>
-                            <textarea id="meta-desc" rows="3" oninput="window.updateCardPreview();" placeholder="О чем проект..." class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none resize-none"></textarea>
+                            <textarea id="meta-desc" rows="3" placeholder="О чем проект..." class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none resize-none"></textarea>
                         </div>
                         <div id="field-project-authors" class="meta-group hidden">
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Авторы</label>
-                            <input type="text" id="meta-authors" oninput="window.updateCardPreview();" placeholder="Иванов И." class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none">
+                            <input type="text" id="meta-authors" placeholder="Иванов И." class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none">
                         </div>
                         <div id="field-project-tags" class="meta-group hidden">
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Теги</label>
-                            <input type="text" id="meta-tags" oninput="window.updateCardPreview();" placeholder="VR, Unity" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none">
+                            <input type="text" id="meta-tags" placeholder="VR, Unity" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none">
                         </div>
                         <div id="field-project-image" class="meta-group hidden">
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Обложка (путь)</label>
-                            <input type="text" id="meta-image" oninput="window.updateCardPreview();" placeholder="img/uploads/..." class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none font-mono">
+                            <input type="text" id="meta-image" placeholder="img/uploads/..." class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none font-mono">
                         </div>
 
                         <!-- Поля для Нового Трека -->
@@ -281,11 +283,11 @@
                         </div>
                         <div id="field-track-icon" class="meta-group hidden">
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Иконка (FA класс/URL)</label>
-                            <input type="text" id="meta-icon" oninput="window.updateCardPreview();" placeholder="fas fa-gamepad" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none">
+                            <input type="text" id="meta-icon" placeholder="fas fa-gamepad" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none">
                         </div>
                         <div id="field-track-color" class="meta-group hidden">
                             <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Цвет карточки</label>
-                            <select id="meta-color" onchange="window.updateCardPreview();" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none font-mono">
+                            <select id="meta-color" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none font-mono">
                                 <option value="bg-kvant">bg-kvant (Фиолетовый)</option>
                                 <option value="bg-blue-600">bg-blue-600</option>
                                 <option value="bg-green-600">bg-green-600</option>
@@ -310,22 +312,22 @@
                 <div class="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-inner h-full min-w-0">
                     <div class="bg-slate-200 dark:bg-slate-800 px-3 py-2 flex gap-1 overflow-x-auto hide-scrollbar text-xs font-bold text-slate-600 dark:text-slate-300 items-center justify-between border-b border-slate-300 dark:border-slate-700">
                         <div class="flex items-center gap-1">
-                            <button onclick="insertTemplate('h2')" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition">H2</button>
-                            <button onclick="insertTemplate('h3')" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition">H3</button>
+                            <button id="toolbar-h2" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition">H2</button>
+                            <button id="toolbar-h3" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition">H3</button>
                             <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                            <button onclick="insertTemplate('bold')" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition" title="Жирный"><i class="fas fa-bold"></i></button>
-                            <button onclick="insertTemplate('code')" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition" title="Код"><i class="fas fa-code"></i></button>
+                            <button id="toolbar-bold" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition" title="Жирный"><i class="fas fa-bold"></i></button>
+                            <button id="toolbar-code" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition" title="Код"><i class="fas fa-code"></i></button>
                             <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                            <button onclick="insertTemplate('quote-warn')" class="hover:bg-red-100 text-red-500 dark:hover:bg-red-900/30 px-2 py-1.5 rounded transition text-xs flex items-center gap-1"><i class="fas fa-exclamation-triangle"></i> Внимание</button>
-                            <button onclick="insertTemplate('quote-tip')" class="hover:bg-green-100 text-green-600 dark:hover:bg-green-900/30 px-2 py-1.5 rounded transition text-xs flex items-center gap-1"><i class="fas fa-lightbulb"></i> Идея</button>
+                            <button id="toolbar-warn" class="hover:bg-red-100 text-red-500 dark:hover:bg-red-900/30 px-2 py-1.5 rounded transition text-xs flex items-center gap-1"><i class="fas fa-exclamation-triangle"></i> Внимание</button>
+                            <button id="toolbar-tip" class="hover:bg-green-100 text-green-600 dark:hover:bg-green-900/30 px-2 py-1.5 rounded transition text-xs flex items-center gap-1"><i class="fas fa-lightbulb"></i> Идея</button>
                             <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                            <button onclick="insertTemplate('compare')" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition"><i class="fas fa-sliders-h mr-1"></i> До/После</button>
-                            <button onclick="insertTemplate('gallery')" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition"><i class="fas fa-images mr-1"></i> Галерея</button>
+                            <button id="toolbar-compare" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition"><i class="fas fa-sliders-h mr-1"></i> До/После</button>
+                            <button id="toolbar-gallery" class="hover:bg-white dark:hover:bg-slate-700 px-2 py-1.5 rounded transition"><i class="fas fa-images mr-1"></i> Галерея</button>
                         </div>
                         
                         <div class="flex items-center">
-                            <input type="file" id="image-upload-input" accept="image/*" class="hidden" onchange="window.uploadImage(event)">
-                            <button onclick="document.getElementById('image-upload-input').click()" id="upload-img-btn" class="bg-kvant/10 text-kvant px-3 py-1.5 rounded-lg flex items-center shadow-sm hover:bg-kvant hover:text-white transition active:scale-95">
+                            <input type="file" id="image-upload-input" accept="image/*" class="hidden">
+                            <button id="upload-img-btn" class="bg-kvant/10 text-kvant px-3 py-1.5 rounded-lg flex items-center shadow-sm hover:bg-kvant hover:text-white transition active:scale-95">
                                 <i class="fas fa-cloud-upload-alt mr-2"></i> Загрузить медиа
                             </button>
                         </div>
@@ -353,7 +355,7 @@
             <div class="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4">
                 <i class="fas fa-search text-slate-400 text-xl"></i>
                 <input type="text" id="search-input" placeholder="Поиск по урокам, шпаргалкам..." class="flex-1 bg-transparent border-none outline-none text-lg md:text-2xl font-medium placeholder:text-slate-300 dark:placeholder:text-slate-700">
-                <button onclick="closeSearch()" class="text-slate-400 hover:text-kvant transition text-2xl">&times;</button>
+                <button id="btn-close-search" class="text-slate-400 hover:text-kvant transition text-2xl">&times;</button>
             </div>
             <div id="search-results" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-2">
                 <!-- Результаты поиска появятся здесь -->
