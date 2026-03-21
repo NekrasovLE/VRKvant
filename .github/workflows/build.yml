@@ -211,6 +211,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -229,7 +234,19 @@ jobs:
           file_pattern: 'articles/*.json css/style.css'
           disable_globbing: true
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
       - name: 🎉 Final Summary
         run: |
-          echo "### 🚀 Сборка завершена" >> $GITHUB_STEP_SUMMARY
-          echo "Изменения зафиксированы. GitHub Pages автоматически обновит сайт в течение минуты." >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Сборка и Деплой завершены" >> $GITHUB_STEP_SUMMARY
+          echo "Сайт успешно обновлен и доступен по адресу: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
