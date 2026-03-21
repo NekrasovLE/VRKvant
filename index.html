@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VR/AR Квантум — База знаний</title>
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+    
     <!-- Иконка вкладки -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥽</text></svg>">
     
@@ -25,11 +29,21 @@
     <script src="https://unpkg.com/force-graph"></script>
     
     <!-- Подсветка синтаксиса Highlight.js -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     
     <!-- НАШИ ЛОКАЛЬНЫЕ ФАЙЛЫ -->
     <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        @media print {
+            nav, aside, footer, #btn-toggle-read, #btn-export-pdf, .flex.bg-slate-100.dark\:bg-slate-800 { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .page-content { padding-top: 0 !important; }
+            #article-viewer { display: block !important; }
+            #article-content { box-shadow: none !important; border: none !important; padding: 0 !important; }
+        }
+    </style>
     <script type="module" src="js/main.js" defer></script>
     
     <!-- Конфиг Tailwind и Темная тема -->

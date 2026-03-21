@@ -9,6 +9,14 @@ import { toggleTheme, toggleMobileMenu, scrollPortfolio, initSidebarTabs, render
 function initEvents() {
     initSidebarTabs();
     renderHomeTracks();
+
+    // Регистрация Service Worker для PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
+        });
+    }
+
     // Навигация
     document.getElementById('nav-logo')?.addEventListener('click', () => window.location.hash = 'home');
     document.getElementById('nav-home')?.addEventListener('click', () => window.location.hash = 'home');
@@ -68,6 +76,11 @@ function initEvents() {
 
     // Делегирование для карточек и ссылок (динамический контент)
     document.addEventListener('click', (e) => {
+        const btnExport = e.target.closest('#btn-export-pdf');
+        if (btnExport) {
+            window.print();
+        }
+
         const btnRead = e.target.closest('#btn-toggle-read');
         if (btnRead) {
             const path = btnRead.getAttribute('data-path');

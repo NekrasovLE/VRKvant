@@ -6,6 +6,14 @@ export function updateThemeIcons(isDark) {
     const iconMobile = document.getElementById('theme-icon-mobile');
     if (icon) icon.classList.replace(isDark ? 'fa-moon' : 'fa-sun', isDark ? 'fa-sun' : 'fa-moon'); 
     if (iconMobile) iconMobile.classList.replace(isDark ? 'fa-moon' : 'fa-sun', isDark ? 'fa-sun' : 'fa-moon'); 
+    
+    // Смена темы Highlight.js
+    const hljsTheme = document.getElementById('hljs-theme');
+    if (hljsTheme) {
+        hljsTheme.href = isDark 
+            ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css'
+            : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+    }
 }
 
 export function toggleTheme() { 
@@ -152,9 +160,9 @@ export function buildLeftSidebar(currentPath) {
     if(!container) return;
     let html = '';
     
-    if(window.siteData && window.siteData.tracks) {
+    if(store.tracks) {
         html += `<div><h4 class="font-bold text-slate-800 dark:text-white mb-2 flex items-center"><div class="w-2 h-2 bg-kvant rounded-full mr-2"></div>Треки</h4>`;
-        window.siteData.tracks.forEach((t, i) => {
+        store.tracks.forEach((t, i) => {
             const listId = `sidebar-track-list-${i}`;
             const iconId = `sidebar-track-icon-${i}`;
             const modules = groupLessonsByModule(t.lessons);
@@ -191,7 +199,7 @@ export function buildLeftSidebar(currentPath) {
         html += `</div>`;
     }
 
-    if(window.siteData && window.siteData.cheats) {
+    if(store.cheats) {
         html += `<div class="mt-8">
             <button data-toggle="sidebar-cheats-list" data-icon="sidebar-cheats-icon" class="sidebar-toggle w-full flex items-center justify-between text-left font-bold text-slate-800 dark:text-white mb-2 hover:text-amber-500 transition-colors group">
                 <span class="flex items-center"><div class="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>Шпаргалки</span>
@@ -199,7 +207,7 @@ export function buildLeftSidebar(currentPath) {
             </button>
             <div id="sidebar-cheats-list" class="overflow-hidden transition-all duration-500 max-h-[2000px] opacity-100">
                 <ul class="space-y-2 text-sm border-l-2 border-slate-100 dark:border-slate-800 ml-1.5 pl-4 pb-2">`;
-        window.siteData.cheats.forEach(c => {
+        store.cheats.forEach(c => {
             const path = `articles/cheats/${c.file}`;
             const isActive = path === currentPath;
             const isRead = isLessonRead(path);

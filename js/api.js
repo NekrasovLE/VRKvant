@@ -1,3 +1,5 @@
+import { store } from './store.js';
+
 export const CONFIG = { 
     tracks: 'articles/tracks.json', 
     cheats: 'articles/cheats.json', 
@@ -6,17 +8,17 @@ export const CONFIG = {
 
 export async function loadGlobalData() {
     try {
-        if(!window.siteData.tracks) {
+        if(!store.tracks) {
             const r1 = await fetch(CONFIG.tracks + '?t=' + new Date().getTime());
-            window.siteData.tracks = (await r1.json()).tracks;
+            store.tracks = (await r1.json()).tracks;
         }
-        if(!window.siteData.cheats) {
+        if(!store.cheats) {
             const r2 = await fetch(CONFIG.cheats + '?t=' + new Date().getTime());
-            window.siteData.cheats = (await r2.json()).cheats;
+            store.cheats = (await r2.json()).cheats;
         }
-        if(!window.siteData.portfolio) {
+        if(!store.portfolio) {
             const r3 = await fetch(CONFIG.portfolio + '?t=' + new Date().getTime());
-            window.siteData.portfolio = (await r3.json()).projects;
+            store.portfolio = (await r3.json()).projects;
         }
     } catch(e) { 
         console.error("Ошибка загрузки манифестов", e); 
