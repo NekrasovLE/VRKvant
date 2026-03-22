@@ -92,7 +92,7 @@ function initEvents() {
             });
         }
 
-        const card = e.target.closest('.card-link');
+        const card = e.target.closest('.card-link, .sidebar-link');
         if (card) {
             const path = card.getAttribute('data-path');
             if (path) window.location.hash = path;
