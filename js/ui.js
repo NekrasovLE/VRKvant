@@ -73,25 +73,22 @@ export async function renderHomeTracks() {
     // Берем первые 3 трека для главной
     container.innerHTML = tracks.slice(0, 3).map(t => {
         const iconHtml = (t.icon && t.icon.includes('/')) 
-            ? `<img src="${t.icon}" alt="icon" class="w-10 h-10 md:w-12 md:h-12 mb-4 md:mb-6 group-hover:scale-110 transition-transform object-contain">` 
-            : `<i class="${t.icon} text-4xl md:text-[3rem] mb-4 md:mb-6 text-indigo-500 leading-none h-10 md:h-12 flex items-center group-hover:scale-110 transition-transform"></i>`;
+            ? `<img src="${t.icon}" alt="icon" class="w-10 h-10 md:w-12 md:h-12 object-contain group-hover:scale-110 transition-transform" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5968/5968391.png'">` 
+            : `<i class="${t.icon} text-3xl md:text-[2.5rem] text-indigo-500 leading-none group-hover:scale-110 transition-transform"></i>`;
 
         const lessonsWithPaths = t.lessons.map(l => ({ ...l, trackPath: `articles/${t.id}` }));
         const progress = getTrackProgress(lessonsWithPaths);
 
+        // Используем белый фон для Unreal, чтобы логотип был виден
+        const iconBg = (t.id === 'unreal' || t.id === 'unity') ? 'bg-white' : 'bg-white dark:bg-slate-800';
+        const iconTextColor = (t.id === 'unreal' || t.id === 'unity') ? 'text-black' : 'text-kvant';
+
         return `
-            <div data-path="article:articles/${t.id}/intro.md" class="card-link p-6 md:p-10 bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] border-2 border-transparent hover:border-kvant cursor-pointer transition-all hover:-translate-y-3 hover:shadow-xl flex flex-col items-center group">
-                ${iconHtml}
-                <h3 class="heading-font text-lg md:text-xl mb-2 w-full text-center">${t.name}</h3>
-                <div class="w-full mt-2">
-                    <div class="flex justify-between items-center mb-1.5">
-                        <span class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Прогресс</span>
-                        <span class="text-[9px] text-kvant font-black">${progress}%</span>
-                    </div>
-                    <div class="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full bg-kvant transition-all duration-1000" style="width: ${progress}%"></div>
-                    </div>
+            <div data-path="article:articles/${t.id}/intro.md" class="card-link p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] cursor-pointer transition-all hover:-translate-y-3 flex flex-col items-center group relative overflow-hidden">
+                <div class="w-16 h-16 md:w-20 md:h-20 ${iconBg} ${iconTextColor} rounded-2xl md:rounded-3xl flex items-center justify-center shadow-lg mb-6 md:mb-8 border border-slate-100 dark:border-slate-800/50">
+                    ${iconHtml}
                 </div>
+                <h3 class="heading-font text-lg md:text-xl font-bold mb-4 w-full text-center group-hover:text-kvant transition-colors">${t.name}</h3>
             </div>`;
     }).join('');
 }
@@ -103,7 +100,7 @@ export async function renderTracks() {
 
     container.innerHTML = tracks.map(t => {
         const iconHtml = (t.icon && t.icon.includes('/')) 
-            ? `<img src="${t.icon}" alt="icon" class="w-10 h-10 md:w-11 md:h-11 object-contain">` 
+            ? `<img src="${t.icon}" alt="icon" class="w-10 h-10 md:w-11 md:h-11 object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5968/5968391.png'">` 
             : `<i class="${t.icon} text-lg md:text-xl"></i>`;
 
         const modules = groupLessonsByModule(t.lessons);
@@ -112,10 +109,13 @@ export async function renderTracks() {
         const lessonsWithPaths = t.lessons.map(l => ({ ...l, trackPath: `articles/${t.id}` }));
         const progress = getTrackProgress(lessonsWithPaths);
 
+        const iconBg = (t.id === 'unreal' || t.id === 'unity') ? 'bg-white' : (t.colorClass || 'bg-kvant');
+        const iconTextColor = (t.id === 'unreal' || t.id === 'unity') ? 'text-black' : 'text-white';
+
         return `
             <div class="bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-10 border border-slate-100 dark:border-slate-800">
                 <div class="flex items-center space-x-4 md:space-x-5 mb-8 md:mb-10">
-                    <div class="w-12 h-12 md:w-14 md:h-14 ${t.colorClass} rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-lg">${iconHtml}</div>
+                    <div class="w-12 h-12 md:w-14 md:h-14 ${iconBg} ${iconTextColor} rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg border border-slate-100 dark:border-slate-800/50">${iconHtml}</div>
                     <div class="flex-1">
                         <h3 class="heading-font text-lg md:text-xl mb-1">${t.name}</h3>
                         <div class="flex items-center gap-3">
@@ -184,7 +184,7 @@ export function buildLeftSidebar(currentPath) {
                                         const isActive = path === currentPath;
                                         const isRead = isLessonRead(path);
                                         return `<li>
-                                            <button data-path="article:${path}" class="card-link text-left w-full transition-colors flex items-center justify-between group/item ${isActive ? 'text-kvant font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}">
+                                            <button data-path="article:${path}" class="sidebar-link text-left w-full transition-colors flex items-center justify-between group/item ${isActive ? 'text-kvant font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}">
                                                 <span class="line-clamp-1">${l.title}</span>
                                                 ${isRead ? '<i class="fas fa-check-circle text-emerald-500 text-[10px] ml-2 shrink-0"></i>' : ''}
                                             </button>
@@ -213,7 +213,7 @@ export function buildLeftSidebar(currentPath) {
             const isActive = path === currentPath;
             const isRead = isLessonRead(path);
             html += `<li>
-                <button data-path="article:${path}" class="card-link text-left w-full transition-colors flex items-center justify-between group/item ${isActive ? 'text-amber-500 font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}">
+                <button data-path="article:${path}" class="sidebar-link text-left w-full transition-colors flex items-center justify-between group/item ${isActive ? 'text-amber-500 font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'}">
                     <span class="line-clamp-1">${c.title}</span>
                     ${isRead ? '<i class="fas fa-check-circle text-emerald-500 text-[10px] ml-2 shrink-0"></i>' : ''}
                 </button>
@@ -366,7 +366,7 @@ export function buildLinksSidebar() {
                 </div>
                 <div class="space-y-2">
                     ${internalLinks.map(l => `
-                        <button data-path="article:${l.href}" class="card-link w-full text-left text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-kvant transition line-clamp-2">
+                        <button data-path="article:${l.href}" class="w-full text-left text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-kvant transition line-clamp-2">
                             <i class="fas fa-file-alt mr-2 opacity-40"></i> ${l.text}
                         </button>
                     `).join('')}
@@ -579,7 +579,7 @@ function createBaseGraph(container, data, highlightPath, isGlobal = false) {
 
                 if (isMissing) ctx.globalAlpha = 0.4;
                 
-                // Рисуем текст с небольшой подложкой для читаемости
+                // Рисуем текст with a small shadow for readability
                 const label = node.title;
                 ctx.fillText(label, node.x, node.y + radius + 2.5);
                 ctx.globalAlpha = 1.0;

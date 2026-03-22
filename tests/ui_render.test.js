@@ -58,7 +58,7 @@ describe('UI Generators (js/ui.js)', () => {
         expect(document.getElementById('portfolio-carousel').innerHTML).toContain('Проекты появятся здесь');
     });
 
-    it('renderHomeTracks should generate first 3 track cards with progress', async () => {
+    it('renderHomeTracks should generate first 3 track cards', async () => {
         const mockTracks = [
             { id: 't1', name: 'Track 1', icon: 'fas fa-1', colorClass: 'bg-red-500', lessons: [] },
             { id: 't2', name: 'Track 2', icon: 'fas fa-2', colorClass: 'bg-blue-500', lessons: [] },
@@ -75,6 +75,5 @@ describe('UI Generators (js/ui.js)', () => {
         
         expect(cards.length).toBe(3); // Должно быть только первые три
         expect(cards[0].innerHTML).toContain('Track 1');
-        expect(cards[0].innerHTML).toContain('50%'); // Из нашего мока прогресса
     });
 });

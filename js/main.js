@@ -76,11 +76,6 @@ function initEvents() {
 
     // Делегирование для карточек и ссылок (динамический контент)
     document.addEventListener('click', (e) => {
-        const btnExport = e.target.closest('#btn-export-pdf');
-        if (btnExport) {
-            window.print();
-        }
-
         const btnRead = e.target.closest('#btn-toggle-read');
         if (btnRead) {
             const path = btnRead.getAttribute('data-path');

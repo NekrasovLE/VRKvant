@@ -74,12 +74,84 @@
   .collapsible-content.show {
     max-height: 5000px; /* Достаточно для большинства статей */
     opacity: 1;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 
   /* Специальные цитаты */
-  blockquote.quote-important { @apply border-l-4 border-red-500 bg-red-50 dark:bg-red-950/20; }
-  blockquote.quote-tip { @apply border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20; }
-  blockquote.quote-warning { @apply border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-950/20; }
-  blockquote.quote-note { @apply border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-950/20; }
+  blockquote { @apply border-l-4 border-slate-200 dark:border-slate-800 p-3 md:p-4 my-6 bg-slate-50/30 dark:bg-slate-900/20 rounded-none; }
+  blockquote.quote-important { @apply border-red-500 bg-red-50 dark:bg-red-950/20 p-4 md:p-6; }
+  blockquote.quote-tip { @apply border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 p-4 md:p-6; }
+  blockquote.quote-warning { @apply border-amber-500 bg-amber-50 dark:bg-amber-950/20 p-4 md:p-6; }
+  blockquote.quote-note { @apply border-blue-500 bg-blue-50 dark:bg-blue-950/20 p-4 md:p-6; }
+
+  /* Карточки */
+  .card-link {
+    @apply border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all bg-white dark:bg-slate-900;
+  }
+  .dark .card-link {
+    @apply border-slate-800 shadow-none hover:shadow-2xl hover:shadow-kvant/10;
+  }
+
+  /* Ссылки в сайдбаре (без рамок) */
+  .sidebar-link {
+    @apply transition-colors duration-200 bg-transparent border-none shadow-none p-0;
+  }
+
+  /* Стили для статьи */
+  .prose {
+    @apply text-slate-700 dark:text-slate-300 antialiased;
+  }
+  
+  .prose h2 {
+    @apply block text-center mb-8 mt-12 text-slate-800 dark:text-white uppercase tracking-[0.2em] font-black text-xl md:text-2xl border-none bg-transparent p-0 rounded-none w-full !important;
+  }
+
+  .prose h3 {
+    @apply text-lg md:text-xl font-bold text-slate-800 dark:text-white mt-8 mb-4;
+  }
+
+  .prose code {
+    @apply bg-slate-100 dark:bg-slate-800/50 text-kvant px-1.5 py-0.5 rounded-md font-mono text-[0.9em] border border-slate-200 dark:border-slate-700/50;
+  }
+  
+  .prose code::before, .prose code::after {
+    content: "" !important;
+  }
+
+  .prose pre {
+    @apply rounded-none border border-slate-200 dark:border-slate-800 p-0 overflow-hidden shadow-lg my-6 bg-slate-50 dark:bg-slate-950/50 !important;
+  }
+
+  .prose pre code {
+    @apply bg-transparent dark:bg-transparent border-none p-4 md:p-6 block text-[0.75rem] md:text-[0.85rem] leading-relaxed overflow-x-auto sidebar-scroll !important;
+  }
+
+  /* Исключаем двойное скругление для кастомных виджетов */
+  .prose img, .prose video {
+    @apply rounded-none shadow-lg mx-auto block my-6 border border-slate-100 dark:border-slate-800 max-w-full;
+  }
+  
+  .relative.overflow-hidden img {
+    @apply rounded-none border-none shadow-none;
+  }
+
+  /* Кастомный скроллбар для кода */
+  .prose pre::-webkit-scrollbar {
+    height: 6px;
+  }
+  .prose pre::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .prose pre::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+  }
+
+  /* Бейдж языка и кнопка копирования */
+  .code-header {
+    @apply flex justify-between items-center px-4 py-2 bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest text-slate-400;
+  }
+
+  .copy-code-btn {
+    @apply hover:text-kvant transition-colors flex items-center gap-1.5;
+  }
 }

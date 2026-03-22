@@ -1,7 +1,15 @@
 // Настройка Markdown парсера (Highlight.js)
 export function initMarkdown() {
     if (typeof marked !== 'undefined' && typeof hljs !== 'undefined') {
+        const renderer = new marked.Renderer();
+        
+        // Кастомный рендеринг изображений для центрирования и скругления
+        renderer.image = (href, title, text) => {
+            return `<img src="${href}" alt="${text}" title="${title || ''}" class="rounded-none shadow-lg mx-auto block my-6 border border-slate-100 dark:border-slate-800 max-w-full">`;
+        };
+
         marked.setOptions({
+            renderer: renderer,
             highlight: (code, lang) => hljs.getLanguage(lang) ? hljs.highlight(code, { language: lang }).value : hljs.highlightAuto(code).value,
             langPrefix: 'hljs language-'
         });
@@ -19,7 +27,7 @@ export function processCustomTags(text) {
     text = text.replace(/\[gallery:\s*(.+?)\]/g, (match, imagesStr) => {
         const images = imagesStr.split('|').map(s => s.trim());
         const id = 'gallery-' + Math.random().toString(36).substr(2, 9);
-        let html = `<div class="relative w-full overflow-hidden rounded-xl md:rounded-[1rem] my-6 md:my-8 shadow-lg md:shadow-xl border border-slate-200 dark:border-slate-800 group bg-slate-50 dark:bg-slate-900" id="${id}"><div class="flex transition-transform duration-500 ease-out" id="${id}-track">`;
+        let html = `<div class="relative w-full overflow-hidden my-6 shadow-lg md:shadow-xl border border-slate-200 dark:border-slate-800 group bg-slate-50 dark:bg-slate-900" id="${id}"><div class="flex transition-transform duration-500 ease-out" id="${id}-track">`;
         images.forEach(img => { html += `<div class="w-full shrink-0 flex items-center justify-center"><img src="${img}" class="max-w-full max-h-[60vh] md:max-h-[75vh] w-auto m-0 border-none rounded-none shadow-none pointer-events-none" style="display:block;"></div>`; });
         html += `</div>`;
         if (images.length > 1) {
@@ -35,7 +43,27 @@ export function processCustomTags(text) {
 
     // Кастомный тег: [compare: ...]
     text = text.replace(/\[compare:\s*(.+?)\s*\|\s*(.+?)\]/g, (match, img1, img2) => {
-        return `<div class="relative w-fit max-w-full mx-auto overflow-hidden rounded-xl md:rounded-[1rem] my-6 md:my-8 shadow-lg md:shadow-xl border border-slate-200 dark:border-slate-800 select-none"><img src="${img2.trim()}" class="max-w-full max-h-[60vh] md:max-h-[75vh] w-auto block m-0 border-none rounded-none shadow-none pointer-events-none" alt="После"><img src="${img1.trim()}" class="compare-before absolute top-0 left-0 w-full h-full object-cover m-0 border-none rounded-none shadow-none pointer-events-none" style="clip-path: inset(0 50% 0 0);" alt="До"><input type="range" min="0" max="100" value="50" class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20 m-0" oninput="window.updateCompare(this)"><div class="compare-handle absolute top-0 bottom-0 w-1 bg-white pointer-events-none z-10 left-1/2 -translate-x-1/2 shadow-[0_0_10px_rgba(0,0,0,0.5)]"><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center text-slate-800 shadow-md"><i class="fas fa-arrows-alt-h text-[10px] md:text-sm"></i></div></div></div>`;
+        return `<div class="relative w-fit max-w-full mx-auto overflow-hidden my-6 shadow-lg md:shadow-xl border border-slate-200 dark:border-slate-800 select-none"><img src="${img2.trim()}" class="max-w-full max-h-[60vh] md:max-h-[75vh] w-auto block m-0 border-none rounded-none shadow-none pointer-events-none" alt="После"><img src="${img1.trim()}" class="compare-before absolute top-0 left-0 w-full h-full object-cover m-0 border-none rounded-none shadow-none pointer-events-none" style="clip-path: inset(0 50% 0 0);" alt="До"><input type="range" min="0" max="100" value="50" class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20 m-0" oninput="window.updateCompare(this)"><div class="compare-handle absolute top-0 bottom-0 w-1 bg-white pointer-events-none z-10 left-1/2 -translate-x-1/2 shadow-[0_0_10px_rgba(0,0,0,0.5)]"><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center text-slate-800 shadow-md"><i class="fas fa-arrows-alt-h text-[10px] md:text-sm"></i></div></div></div>`;
+    });
+
+    // Кастомный тег: [video: ...]
+    text = text.replace(/\[video:\s*(.+?)\]/g, (match, url) => {
+        url = url.trim();
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            const id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
+            return `<div class="aspect-video my-6 shadow-xl rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-900 mx-auto block max-w-full"><iframe src="https://www.youtube.com/embed/${id}" class="w-full h-full" frameborder="0" allowfullscreen></iframe></div>`;
+        }
+        return `<video src="${url}" controls class="w-full my-6 shadow-xl rounded-2xl border border-slate-100 dark:border-slate-800 max-w-full mx-auto block"></video>`;
+    });
+
+    // Кастомный тег: [blueprint: ...]
+    text = text.replace(/\[blueprint:\s*(.+?)\]/g, (match, url) => {
+        url = url.trim();
+        let embedUrl = url;
+        if (url.includes('blueprintue.com/blueprint/')) {
+            embedUrl = url.replace('/blueprint/', '/render/');
+        }
+        return `<div class="w-full h-[400px] md:h-[600px] max-h-[70vh] my-6 shadow-xl rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-900 mx-auto block max-w-full"><iframe src="${embedUrl}" class="w-full h-full border-none" scrolling="no" allowfullscreen></iframe></div>`;
     });
 
     // Возвращаем код
@@ -68,12 +96,29 @@ window.updateCompare = function(input) {
 export function styleSpecialQuotes(container = document.getElementById('article-content')) {
     if (!container) return;
     const quotes = container.querySelectorAll('blockquote');
+    const keywords = [
+        { key: 'важно:', class: 'quote-important' },
+        { key: 'совет:', class: 'quote-tip' },
+        { key: 'лайфхак:', class: 'quote-tip' },
+        { key: 'внимание:', class: 'quote-warning' },
+        { key: 'предупреждение:', class: 'quote-warning' },
+        { key: 'заметка:', class: 'quote-note' },
+        { key: 'информация:', class: 'quote-note' }
+    ];
+
     quotes.forEach(q => {
-        const text = q.innerText.toLowerCase();
-        if (text.includes('важно:')) q.classList.add('quote-important');
-        else if (text.includes('совет:') || text.includes('лайфхак:')) q.classList.add('quote-tip');
-        else if (text.includes('внимание:') || text.includes('предупреждение:')) q.classList.add('quote-warning');
-        else if (text.includes('заметка:') || text.includes('информация:')) q.classList.add('quote-note');
+        const content = q.innerHTML;
+        const lowerContent = content.toLowerCase();
+        
+        for (const k of keywords) {
+            if (lowerContent.includes(k.key)) {
+                q.classList.add(k.class);
+                // Просто скрываем ключевое слово
+                const regex = new RegExp(`(<strong>)?${k.key}(</strong>)?`, 'i');
+                q.innerHTML = q.innerHTML.replace(regex, '').trim();
+                break;
+            }
+        }
     });
 }
 
@@ -109,7 +154,7 @@ export function makeHeadersCollapsible(container = document.getElementById('arti
 export function addCodeFeatures(container = document.getElementById('article-content')) {
     if (!container) return;
     container.querySelectorAll('pre').forEach((pre) => {
-        if (pre.querySelector('.copy-code-btn')) return;
+        if (pre.querySelector('.code-header')) return;
         
         const codeBlock = pre.querySelector('code');
         if (!codeBlock) return; 
@@ -117,26 +162,24 @@ export function addCodeFeatures(container = document.getElementById('article-con
         let lang = "CODE";
         if (codeBlock.className) { 
             const match = codeBlock.className.match(/language-(\w+)/); 
-            if (match) lang = match[1]; 
+            if (match) lang = match[1].toUpperCase(); 
         }
         
         if (typeof hljs !== 'undefined') hljs.highlightElement(codeBlock);
         
-        const badge = document.createElement('div'); 
-        badge.className = 'lang-badge'; 
-        badge.textContent = lang; 
-        pre.appendChild(badge);
+        // Создаем шапку блока кода
+        const header = document.createElement('div');
+        header.className = 'code-header';
+        header.innerHTML = `<span>${lang}</span><button class="copy-code-btn"><i class="far fa-copy"></i> Copy</button>`;
         
-        const btn = document.createElement('button'); 
-        btn.className = 'copy-code-btn'; 
-        btn.innerHTML = '<i class="far fa-copy"></i> Copy';
+        pre.insertBefore(header, codeBlock);
         
+        const btn = header.querySelector('.copy-code-btn');
         btn.onclick = () => { 
             navigator.clipboard.writeText(codeBlock.innerText).then(() => { 
-                btn.innerHTML = '<i class="fas fa-check text-green-400"></i> Done'; 
+                btn.innerHTML = '<i class="fas fa-check text-emerald-500"></i> Done'; 
                 setTimeout(() => { btn.innerHTML = '<i class="far fa-copy"></i> Copy'; }, 2000); 
             }); 
         };
-        pre.appendChild(btn);
     });
 }

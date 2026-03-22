@@ -170,9 +170,6 @@ async function renderArticle(path) {
             metadataHtml = `
                 <div class="mb-8 md:mb-12 border-b border-slate-100 dark:border-slate-800 pb-8 md:pb-10 relative group/meta">
                     <div class="absolute -top-2 -right-2 md:top-0 md:right-0 flex gap-2">
-                        <button id="btn-export-pdf" title="Скачать PDF / Печать" class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:scale-110 transition-all shadow-sm text-slate-400 hover:text-kvant">
-                            <i class="fas fa-file-pdf"></i>
-                        </button>
                         <button id="btn-toggle-read" data-path="${targetPath}" title="${isRead ? 'Отметить как непрочитанное' : 'Отметить как пройденное'}" class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:scale-110 transition-all shadow-sm group ${isRead ? 'is-read' : ''}">
                             <i class="fas fa-check text-slate-300 group-[.is-read]:text-emerald-500 transition-colors"></i>
                         </button>
