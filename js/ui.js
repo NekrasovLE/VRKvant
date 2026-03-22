@@ -80,8 +80,8 @@ export async function renderHomeTracks() {
         const progress = getTrackProgress(lessonsWithPaths);
 
         // Используем белый фон для Unreal, чтобы логотип был виден
-        const iconBg = (t.id === 'unreal' || t.id === 'unity') ? 'bg-white' : 'bg-white dark:bg-slate-800';
-        const iconTextColor = (t.id === 'unreal' || t.id === 'unity') ? 'text-black' : 'text-kvant';
+        const iconBg = t.id === 'unreal' ? 'bg-zinc-900 dark:bg-white' : (t.id === 'unity' ? 'bg-slate-100 dark:bg-zinc-800' : 'bg-white dark:bg-slate-800');
+        const iconTextColor = t.id === 'unreal' ? 'text-white dark:text-black' : (t.id === 'unity' ? 'text-black dark:text-white' : 'text-kvant');
 
         return `
             <div data-path="article:articles/${t.id}/intro.md" class="card-link p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] cursor-pointer transition-all hover:-translate-y-3 flex flex-col items-center group relative overflow-hidden">
@@ -109,8 +109,8 @@ export async function renderTracks() {
         const lessonsWithPaths = t.lessons.map(l => ({ ...l, trackPath: `articles/${t.id}` }));
         const progress = getTrackProgress(lessonsWithPaths);
 
-        const iconBg = (t.id === 'unreal' || t.id === 'unity') ? 'bg-white' : (t.colorClass || 'bg-kvant');
-        const iconTextColor = (t.id === 'unreal' || t.id === 'unity') ? 'text-black' : 'text-white';
+        const iconBg = t.id === 'unreal' ? 'bg-zinc-900 dark:bg-white' : (t.id === 'unity' ? 'bg-slate-100 dark:bg-zinc-800' : (t.colorClass || 'bg-kvant'));
+        const iconTextColor = t.id === 'unreal' ? 'text-white dark:text-black' : (t.id === 'unity' ? 'text-black dark:text-white' : 'text-white');
 
         return `
             <div class="bg-slate-50 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-10 border border-slate-100 dark:border-slate-800">
